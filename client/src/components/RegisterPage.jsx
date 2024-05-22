@@ -7,13 +7,17 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function registerUser(event) {
+  async function registerUser(event) {
     event.preventDefault();
-    //eto pare imbis na fetch ng react ginamit ko nag Axios library ako para madali
-    axios.post("/RegisterPage", { name, email, password }).catch((error) => {
-      //yang localhost na yan par yan ung port nung backend jan siya kukuha ng API
-      console.log(error);
-    });
+    try {
+      axios.post("/RegisterPage", { name, email, password }).catch((error) => {
+        //yang localhost na yan par yan ung port nung backend jan siya kukuha ng API
+        console.log(error);
+      });
+      alert("Registration Success, You can now log in.");
+    } catch (except) {
+      alert("Registration Failed. Please try again later.");
+    }
   }
 
   return (

@@ -8,13 +8,16 @@ const app = express(); // Creates an Express application instance
 const User = require("./models/UserModel"); // Imports the User model from the models directory
 
 // Security
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs"); // For password hashing
 require("dotenv").config(); // Loads environment variables from .env file
 
 // Middleware for encrypting password
 const bcryptSalt = bcrypt.genSaltSync(13); // Generates a salt for password hashing
+//Middleware for isAdmin Authentication
+const verifyAdmin = require("./middlewares/verifyAdmin");
 
-app.use(express.json()); // Parses incoming JSON data in requests
+app.use(express.json()); // Parses incoming JSON data in requests coz json lng ang tinatanggap sa api
 
 // CORS Configuration
 app.use(
@@ -49,6 +52,35 @@ app.post("/RegisterPage", async (req, res) => {
   } catch (error) {
     console.error(error); // Logs any errors during user creation
     res.status(500).json({ message: "Error creating user" }); // Sends error response
+  }
+});
+
+//Login User Endpoint
+app.post("/LoginPage", async (req, res) => {
+  const { email, password } = req.body;
+  const LoggedInUser = await User.findOne({ email });
+
+  if (LoggedInUser) {
+    const correctPass = bcrypt.compareSync(password, LoggedInUser.password);
+    if (correctPass) {
+      jwt.sign(
+        {
+          email: LoggedInUser.email,
+          id: LoggedInUser._id,
+          isAdmin: LoggedInUser.isAdmin,
+        },
+        process.env.JWT_SECRET,
+        {},
+        (err, token) => {
+          if (err) throw err;
+          res.cookie("token", token).json("pass ok");
+        }
+      );
+    } else {
+      res.status(422).json("invalid pass");
+    }
+  } else {
+    res.json("not found");
   }
 });
 
