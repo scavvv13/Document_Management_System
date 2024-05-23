@@ -72,15 +72,19 @@ app.post("/LoginPage", async (req, res) => {
         process.env.JWT_SECRET,
         {},
         (err, token) => {
-          if (err) throw err;
+          if (err) {
+            console.error(err); // Log any JWT signing errors
+            res.status(500).json({ message: "Internal server error" });
+            return;
+          }
           res.cookie("token", token).json("pass ok");
         }
       );
     } else {
-      res.status(422).json("invalid pass");
+      res.status(401).json({ message: "Invalid email or password" });
     }
   } else {
-    res.json("not found");
+    res.status(404).json({ message: "User not found" });
   }
 });
 

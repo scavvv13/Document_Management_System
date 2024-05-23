@@ -10,15 +10,20 @@ function LoginPage() {
   async function LoginUser(event) {
     event.preventDefault();
     try {
-      await axios.post(
+      const response = await axios.post(
         "/LoginPage",
         { email, password },
         { withCredentials: true }
       );
-      alert("Login Successful!");
-      setRedirect(true);
-    } catch (except) {
+      if (response.data === "pass ok") {
+        alert("Login Successful!");
+        setRedirect(true);
+      } else {
+        alert("Invalid email or password. Please try again.");
+      }
+    } catch (error) {
       alert("Login Failed. Please Try Again");
+      console.error(error); // Logging the error for debugging purposes
     }
   }
 
