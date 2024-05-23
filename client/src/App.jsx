@@ -4,17 +4,20 @@ import IndexPage from "./components/IndexPage";
 import Layout from "./Layout";
 import RegisterPage from "./components/RegisterPage";
 import axios from "axios";
+import { UserContextProvider } from "./UserContext";
 
 axios.defaults.baseURL = "http://localhost:5005";
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<IndexPage />} />
-        <Route path="/LoginPage" element={<LoginPage />} />
-        <Route path="/RegisterPage" element={<RegisterPage />} />
-      </Route>
-    </Routes>
+    <UserContextProvider>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<IndexPage />} />
+          <Route path="/LoginPage" element={<LoginPage />} />
+          <Route path="/RegisterPage" element={<RegisterPage />} />
+        </Route>
+      </Routes>
+    </UserContextProvider>
   );
 }
 

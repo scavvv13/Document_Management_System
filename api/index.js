@@ -1,7 +1,7 @@
 const express = require("express"); // Express.js for backend framework
 const cors = require("cors"); // para ma integrate yung port ng front end and back end
 const { mongoose } = require("mongoose"); // Connects to MongoDB database
-
+const cookieParser = require("cookie-parser");
 const app = express(); // Creates an Express application instance
 
 // Models
@@ -18,6 +18,7 @@ const bcryptSalt = bcrypt.genSaltSync(13); // Generates a salt for password hash
 const verifyAdmin = require("./middlewares/verifyAdmin");
 
 app.use(express.json()); // Parses incoming JSON data in requests coz json lng ang tinatanggap sa api
+app.use(cookieParser());
 
 // CORS Configuration
 app.use(
@@ -77,7 +78,7 @@ app.post("/LoginPage", async (req, res) => {
             res.status(500).json({ message: "Internal server error" });
             return;
           }
-          res.cookie("token", token).json("pass ok");
+          res.cookie("token", token).json(LoggedInUser);
         }
       );
     } else {
@@ -86,6 +87,11 @@ app.post("/LoginPage", async (req, res) => {
   } else {
     res.status(404).json({ message: "User not found" });
   }
+});
+
+app.get("/profile", (req, res) => {
+  const { token } = req.cookies;
+  res.json({ token });
 });
 
 // Start the Server

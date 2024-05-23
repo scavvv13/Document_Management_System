@@ -1,7 +1,7 @@
 function IndexPage() {
   return (
     <>
-      <div>here</div>
+      <div>index page here</div>
     </>
   );
 }
