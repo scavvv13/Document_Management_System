@@ -68,6 +68,7 @@ app.post("/LoginPage", async (req, res) => {
         {
           email: LoggedInUser.email,
           id: LoggedInUser._id,
+          name: LoggedInUser.name,
           isAdmin: LoggedInUser.isAdmin,
         },
         process.env.JWT_SECRET,
@@ -91,7 +92,19 @@ app.post("/LoginPage", async (req, res) => {
 
 app.get("/profile", (req, res) => {
   const { token } = req.cookies;
-  res.json({ token });
+  if (token) {
+    jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
+      if (err) throw err;
+      const { name, email, _id, isAdmin } = await User.findById(userData.id);
+      res.json({ name, email, _id, isAdmin });
+    });
+  } else {
+    res.json(null);
+  }
+});
+
+app.post("/logout", (req, res) => {
+  res.cookie("token", "").json(true);
 });
 
 // Start the Server
