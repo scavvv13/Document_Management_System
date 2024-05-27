@@ -2,18 +2,10 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../UserContext";
 
-function Header() {
+export default function Header() {
   const { user } = useContext(UserContext);
   return (
-    //MIAA logo
     <div className="flex justify-between">
-      <img
-        src={
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Manila_International_Airport_Authority_%28MIAA%29.svg/1199px-Manila_International_Airport_Authority_%28MIAA%29.svg.png"
-        }
-        alt="Image description"
-        width="150"
-      />
       {/* NAVBAR--------------- */}
       <div className="gap-2 flex border border-gray-500 rounded-full px-4 py-2 shadow-md shadow-gray-400 h-12">
         <div>Origin</div>
@@ -38,6 +30,18 @@ function Header() {
           </svg>
         </button>
       </div>
+      {/* MIAAA LOGOO */}
+      <div className=" justify-center">
+        <Link to={"/"}>
+          <img
+            src={
+              "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Manila_International_Airport_Authority_%28MIAA%29.svg/1199px-Manila_International_Airport_Authority_%28MIAA%29.svg.png"
+            }
+            alt="Image description"
+            width="150"
+          />
+        </Link>
+      </div>
       {/* SIGNIN/REGISTER--------------------------- */}
       <div className="flex items-center gap-2 border border-gray-500 rounded-full px-4 py-2 shadow-md shadow-gray-400 h-12">
         <svg
@@ -56,7 +60,7 @@ function Header() {
         </svg>
 
         <div>
-          <Link to="/LoginPage" className=" ">
+          <Link to={user ? "/AccountPage" : "/LoginPage"} className=" ">
             <div className="flex pl-2 items-center">
               {" "}
               {/* Added items-center for vertical alignment */}
@@ -80,5 +84,3 @@ function Header() {
     </div>
   );
 }
-
-export default Header;

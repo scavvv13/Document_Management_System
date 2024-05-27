@@ -12,10 +12,9 @@ function LoginPage() {
   async function LoginUser(event) {
     event.preventDefault();
     try {
-      const response = await axios.post("/LoginPage", { email, password });
-      setUser(response.data);
+      const { data } = await axios.post("/LoginPage", { email, password });
+      setUser(data);
       alert("Login successful");
-
       setRedirect(true);
     } catch (e) {
       alert("Login failed");
@@ -26,9 +25,9 @@ function LoginPage() {
     return <Navigate to={"/"} />;
   }
   return (
-    <div className="mt-4 grow flex items-center justify-around ">
+    <div className=" mt-20 grow flex items-center justify-around ">
       <div className="mb-60">
-        <h1 className=" text-4xl text-center mb-4">Login</h1>
+        <h1 className=" text-4xl text-center mb-10">Login</h1>
         <form className="max-w-md mx-auto" onSubmit={LoginUser}>
           <input
             type="email"
