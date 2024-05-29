@@ -2,6 +2,8 @@ const express = require("express"); // Express.js for backend framework
 const cors = require("cors"); // para ma integrate yung port ng front end and back end
 const { mongoose } = require("mongoose"); // Connects to MongoDB database
 const cookieParser = require("cookie-parser");
+const fs = require("fs");
+const path = require("path");
 const app = express(); // Creates an Express application instance
 
 // Models
@@ -107,5 +109,92 @@ app.post("/logout", (req, res) => {
   res.cookie("token", "").json(true);
 });
 
+// Starts the server on the PORT environment variable
+
+//TESTIN--------------------------------------------
+const multer = require("multer");
+const Document = require("./models/Document");
+
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+app.post("/upload", upload.single("file"), async (req, res) => {
+  const { file } = req;
+  const userId = req.body.userId; // Get userId from the request body
+
+  const newDocument = new Document({
+    filename: file.filename,
+    originalname: file.originalname,
+    contentType: file.mimetype,
+    size: file.size,
+    path: file.path,
+    userId: new mongoose.Types.ObjectId(userId),
+  });
+
+  try {
+    await newDocument.save();
+    res.status(201).send("File uploaded successfully");
+  } catch (error) {
+    console.error("Error saving document:", error);
+    res.status(500).send(error);
+  }
+});
+
+app.get("/documents", async (req, res) => {
+  const userId = req.query.userId; // Get userId from the query parameters
+  console.log("Fetching documents for user ID:", userId);
+  try {
+    const documents = await Document.find({ userId });
+    res.status(200).json(documents);
+  } catch (err) {
+    console.error("Error fetching documents:", err);
+    res.status(500).send(err);
+  }
+});
+
+// Update the DELETE endpoint for documents
+app.delete("/documents/:documentId", async (req, res) => {
+  const { documentId } = req.params;
+
+  try {
+    // Find the document by ID
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return res.status(404).send("Document not found");
+    }
+
+    // Delete document from database
+    await Document.findByIdAndDelete(documentId);
+
+    // Delete document from uploads directory
+    const filePath = path.join(__dirname, "uploads", document.filename);
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Error deleting file:", err);
+        return res.status(500).send("Error deleting file");
+      }
+      console.log("File deleted successfully");
+    });
+
+    res.status(200).send("Document deleted successfully");
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
 // Start the Server
-app.listen(process.env.PORT); // Starts the server on the PORT environment variable
+app.listen(process.env.PORT);

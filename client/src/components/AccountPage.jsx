@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { UserContext } from "../UserContext";
 import { Link, Navigate, useParams } from "react-router-dom";
 import axios from "axios";
+import MyDocuments from "./MyDocuments";
 
 export default function AccountPage() {
   const [redirect, setRedirect] = useState(null);
@@ -51,7 +52,7 @@ export default function AccountPage() {
           My Documents
         </Link>
         <Link className={linkClasses("places")} to={"/AccountPage/places"}>
-          Accomodations
+          Accommodations
         </Link>
       </nav>
       {subpage === "profile" && (
@@ -62,6 +63,7 @@ export default function AccountPage() {
           </button>
         </div>
       )}
+      {subpage === "documents" && <MyDocuments />}
     </div>
   );
 }
