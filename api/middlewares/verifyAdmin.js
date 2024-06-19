@@ -1,16 +1,31 @@
+const verifyJWT = require("../utils/authUtils");
 const verifyAdmin = async (req, res, next) => {
   try {
-    // Extract user information from the JWT token (replace with your JWT verification logic)
-    const decoded = await verifyJWT(req.headers.authorization); // Replace verifyJWT with your implementation
-    const user = decoded.user; // Assuming user data is stored in the token
+    const authorizationHeader = req.headers.authorization;
+    console.log("Authorization Header:", authorizationHeader); // Debug log
 
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized" }); // Handle missing or invalid token
+    if (!authorizationHeader) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized, no token provided" });
     }
-    req.user = user; // Store the user object for access in route handlers (optional)
+
+    const token = authorizationHeader.split(" ")[1]; // Extract the token
+    console.log("Token received:", token); // Debug log
+    const decoded = await verifyJWT(token); // Use your JWT verification logic
+    console.log("Decoded token:", decoded); // Debug log
+    const user = decoded; // Assuming user data is stored in the token
+
+    if (!user || !user.isAdmin) {
+      console.log("Unauthorized access attempt"); // Debug log
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    req.user = user; // Store the user object for access in route handlers
     next(); // Continue to the route handler
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" }); // Handle JWT verification errors
+    console.error("Error verifying admin:", error); // Debug log
+    return res.status(401).json({ message: "Unauthorized" });
   }
 };
 

@@ -11,6 +11,8 @@ const User = require("./models/UserModel"); // Imports the User model from the m
 
 // Security
 const jwt = require("jsonwebtoken");
+const verifyJWT = require("./utils/authUtils");
+
 const bcrypt = require("bcryptjs"); // For password hashing
 require("dotenv").config(); // Loads environment variables from .env file
 
@@ -42,14 +44,15 @@ app.get("/test", (req, res) => {
 
 // Register User Endpoint
 app.post("/RegisterPage", async (req, res) => {
-  const { name, email, password } = req.body; // Destructures user data from request body
+  const { name, email, password, isAdmin } = req.body; // Destructures user data from request body
 
   try {
     const createdUser = await User.create({
       // Attempts to create a new user document
       name,
       email,
-      password: bcrypt.hashSync(password, bcryptSalt), // Hashes password before saving
+      password: bcrypt.hashSync(password, bcryptSalt),
+      isAdmin, // Hashes password before saving
     });
     res.json(createdUser); // Sends the created user document as response
   } catch (error) {
@@ -193,6 +196,74 @@ app.delete("/documents/:documentId", async (req, res) => {
   } catch (error) {
     console.error("Error deleting document:", error);
     res.status(500).send("Internal server error");
+  }
+});
+
+const Memo = require("./models/Memo");
+
+app.get("/memos", async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  try {
+    const memos = await Memo.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    res.status(200).json(memos);
+  } catch (error) {
+    console.error("Error fetching memos:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/memos", async (req, res) => {
+  const { title, content } = req.body;
+
+  try {
+    const memo = new Memo({ title, content });
+    await memo.save();
+    res.status(201).json(memo);
+  } catch (error) {
+    console.error("Error creating memo:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.delete("/memos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const memo = await Memo.findById(id);
+    if (!memo) {
+      return res.status(404).json({ message: "Memo not found" });
+    }
+
+    await memo.deleteOne(); // Use deleteOne() to delete the memo
+    res.status(200).json({ message: "Memo deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting memo:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.put("/memos/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title, content } = req.body;
+
+  try {
+    const memo = await Memo.findById(id);
+    if (!memo) {
+      return res.status(404).json({ message: "Memo not found" });
+    }
+
+    // Update memo fields
+    memo.title = title;
+    memo.content = content;
+
+    await memo.save(); // Save the updated memo
+    res.status(200).json(memo); // Return the updated memo as JSON response
+  } catch (error) {
+    console.error("Error updating memo:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
