@@ -168,6 +168,27 @@ app.get("/documents", async (req, res) => {
   }
 });
 
+app.get("/users", async (req, res) => {
+  try {
+    // Fetch users with their documents
+    const usersWithDocuments = await User.aggregate([
+      {
+        $lookup: {
+          from: "documents",
+          localField: "_id",
+          foreignField: "userId",
+          as: "documents",
+        },
+      },
+    ]);
+
+    res.status(200).json(usersWithDocuments);
+  } catch (error) {
+    console.error("Error fetching users and documents:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 // Update the DELETE endpoint for documents
 app.delete("/documents/:documentId", async (req, res) => {
   const { documentId } = req.params;

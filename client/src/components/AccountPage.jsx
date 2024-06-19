@@ -1,14 +1,15 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { UserContext } from "../UserContext";
 import { Link, Navigate, useParams } from "react-router-dom";
 import axios from "axios";
 import MyDocuments from "./MyDocuments";
+import UsersAndDocuments from "./UsersAndDocuments"; // Ensure to import this component
 
-export default function AccountPage() {
+const AccountPage = () => {
   const [redirect, setRedirect] = useState(null);
   const { ready, user, setUser } = useContext(UserContext);
-
   let { subpage } = useParams();
+
   if (subpage === undefined) {
     subpage = "profile";
   }
@@ -41,7 +42,7 @@ export default function AccountPage() {
 
   return (
     <div>
-      <nav className=" w-full mt-8 gap-2 mb-8 justify-center flex">
+      <nav className="w-full mt-8 gap-2 mb-8 justify-center flex">
         <Link className={linkClasses("profile")} to={"/AccountPage"}>
           My Profile
         </Link>
@@ -51,12 +52,14 @@ export default function AccountPage() {
         >
           My Documents
         </Link>
-        <Link className={linkClasses("places")} to={"/AccountPage/places"}>
-          Accommodations
-        </Link>
+        {user.isAdmin && (
+          <Link className={linkClasses("users")} to={"/AccountPage/users"}>
+            Users and Their Documents
+          </Link>
+        )}
       </nav>
       {subpage === "profile" && (
-        <div className="text-center m-w-lg mx-auto ">
+        <div className="text-center max-w-lg mx-auto">
           Logged in as {user.name} ({user.email}) <br />
           <button onClick={logout} className="primary max-w-sm mt-8">
             Logout
@@ -64,6 +67,10 @@ export default function AccountPage() {
         </div>
       )}
       {subpage === "documents" && <MyDocuments />}
+      {subpage === "users" && <UsersAndDocuments />}{" "}
+      {/* Render UsersAndDocuments component */}
     </div>
   );
-}
+};
+
+export default AccountPage;
