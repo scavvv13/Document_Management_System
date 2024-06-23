@@ -1,3 +1,4 @@
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import IndexPage from "./components/IndexPage";
@@ -6,10 +7,14 @@ import RegisterPage from "./components/RegisterPage";
 import axios from "axios";
 import { UserContextProvider } from "./UserContext";
 import AccountPage from "./components/AccountPage";
+import Modal from "react-modal";
 
 axios.defaults.withCredentials = true;
-
 axios.defaults.baseURL = "http://localhost:5005";
+
+// Set the app element for react-modal for accessibility
+Modal.setAppElement("#root");
+
 function App() {
   return (
     <UserContextProvider>

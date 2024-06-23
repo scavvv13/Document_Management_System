@@ -156,6 +156,26 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+app.get("/documents/:documentId/content", async (req, res) => {
+  const { documentId } = req.params;
+  try {
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return res.status(404).send("Document not found");
+    }
+    const filePath = path.join(__dirname, "uploads", document.filename);
+    fs.readFile(filePath, "utf8", (err, data) => {
+      if (err) {
+        return res.status(500).send("Error reading file");
+      }
+      res.send(data);
+    });
+  } catch (error) {
+    console.error("Error fetching document content:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
 app.get("/documents", async (req, res) => {
   const userId = req.query.userId; // Get userId from the query parameters
   console.log("Fetching documents for user ID:", userId);
@@ -168,9 +188,36 @@ app.get("/documents", async (req, res) => {
   }
 });
 
+app.get("/users/suggestions", async (req, res) => {
+  const uploadedBy = req.query.uploadedBy;
+
+  try {
+    const users = await User.find({
+      name: { $regex: uploadedBy, $options: "i" },
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching user suggestions:", error);
+    res.status(500).json({ error: "Error fetching user suggestions" });
+  }
+});
+
+app.get("/documents/suggestions", async (req, res) => {
+  const documentName = req.query.documentName;
+
+  try {
+    const documents = await Document.find({
+      documentName: { $regex: documentName, $options: "i" },
+    });
+    res.status(200).json(documents);
+  } catch (error) {
+    console.error("Error fetching document suggestions:", error);
+    res.status(500).json({ error: "Error fetching document suggestions" });
+  }
+});
+// Fetch all users with their documents
 app.get("/users", async (req, res) => {
   try {
-    // Fetch users with their documents
     const usersWithDocuments = await User.aggregate([
       {
         $lookup: {
@@ -181,11 +228,60 @@ app.get("/users", async (req, res) => {
         },
       },
     ]);
-
     res.status(200).json(usersWithDocuments);
+  } catch (err) {
+    console.error("Error fetching users with documents:", err);
+    res.status(500).send(err);
+  }
+});
+
+app.get("/global-search", async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    // Search for documents
+    const documentResults = await Document.find({
+      $or: [
+        { originalname: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    // Populate the uploadedBy field with the user's name
+    await Document.populate(documentResults, {
+      path: "userId",
+      select: "name",
+    });
+
+    // Search for users
+    const userResults = await User.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    // Format results for display in the modal
+    const formattedResults = [
+      ...documentResults.map((doc) => ({
+        _id: doc._id,
+        originalname: doc.originalname,
+        description: doc.description,
+        uploadedBy: doc.userId.name, // Use populated userId.name as uploadedBy
+        type: "document", // Marking as document type
+      })),
+      ...userResults.map((user) => ({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        type: "user", // Marking as user type
+      })),
+    ];
+
+    res.status(200).json(formattedResults);
   } catch (error) {
-    console.error("Error fetching users and documents:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error fetching search results:", error);
+    res.status(500).json({ error: "Error fetching search results" });
   }
 });
 
@@ -220,7 +316,60 @@ app.delete("/documents/:documentId", async (req, res) => {
   }
 });
 
+// DELETE user and their documents
+app.delete("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Validate if userId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send("Invalid user ID");
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Delete user's documents from database
+    await Document.deleteMany({ user: userId });
+
+    // Delete user from database
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).send("User and associated documents deleted successfully");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+app.put("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { isAdmin } = req.body;
+
+  try {
+    // Find user by ID and update isAdmin field
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      { isAdmin },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).send("User not found");
+    }
+
+    // Respond with updated user object
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
 const Memo = require("./models/Memo");
+const UserModel = require("./models/UserModel");
 
 app.get("/memos", async (req, res) => {
   const { page = 1, limit = 10 } = req.query;

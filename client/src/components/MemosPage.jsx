@@ -18,41 +18,41 @@ const MemosPage = () => {
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
 
-        // Group memos by date and categorize into "today", "yesterday", and other days
-        const groupedMemos = response.data.reduce(
-          (acc, memo) => {
-            const memoDate = new Date(memo.createdAt);
+        const getFormattedDate = (date) => {
+          const memoDate = new Date(date);
+          const daysDifference = Math.floor(
+            (today - memoDate) / (1000 * 60 * 60 * 24)
+          );
 
-            if (memoDate.toDateString() === today.toDateString()) {
-              acc.today.push(memo);
-            } else if (memoDate.toDateString() === yesterday.toDateString()) {
-              acc.yesterday.push(memo);
-            } else {
-              const monthName = memoDate.toLocaleString("default", {
-                month: "long",
-              });
-              const dayName = memoDate.toLocaleString("default", {
-                weekday: "long",
-              });
-              const key = `${monthName} ${dayName}`;
-              if (!acc[key]) {
-                acc[key] = [];
-              }
-              acc[key].push(memo);
-            }
-            return acc;
-          },
-          { today: [], yesterday: [] }
-        );
+          if (memoDate.toDateString() === today.toDateString()) {
+            return "Today";
+          } else if (memoDate.toDateString() === yesterday.toDateString()) {
+            return "Yesterday";
+          } else if (daysDifference < 7) {
+            return memoDate.toLocaleString("default", { weekday: "long" });
+          } else {
+            return memoDate.toLocaleDateString(undefined, {
+              month: "long",
+              day: "numeric",
+            });
+          }
+        };
+
+        // Group memos by date
+        const groupedMemos = response.data.reduce((acc, memo) => {
+          const dateKey = getFormattedDate(memo.createdAt);
+          if (!acc[dateKey]) {
+            acc[dateKey] = [];
+          }
+          acc[dateKey].push(memo);
+          return acc;
+        }, {});
 
         // Convert grouped memos object to array for rendering
-        const memosArray = [
-          { title: "Today", memos: groupedMemos.today },
-          { title: "Yesterday", memos: groupedMemos.yesterday },
-          ...Object.keys(groupedMemos)
-            .filter((key) => key !== "today" && key !== "yesterday")
-            .map((key) => ({ title: key, memos: groupedMemos[key] })),
-        ];
+        const memosArray = Object.keys(groupedMemos).map((key) => ({
+          title: key,
+          memos: groupedMemos[key],
+        }));
 
         setMemos(memosArray);
       } catch (error) {

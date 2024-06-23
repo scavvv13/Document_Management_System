@@ -14,7 +14,6 @@ const MyDocuments = () => {
       const fetchDocuments = async () => {
         try {
           const response = await axios.get("http://localhost:5005/documents", {
-            // Ensure this URL matches your backend
             params: { userId: user._id },
           });
           setDocuments(response.data);
@@ -41,11 +40,10 @@ const MyDocuments = () => {
 
     try {
       await axios.post("http://localhost:5005/upload", formData, {
-        // Ensure this URL matches your backend
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        withCredentials: true, // Add this line to include credentials in the request
+        withCredentials: true,
       });
       setSelectedFile(null);
       fileInputRef.current.value = "";
