@@ -30,6 +30,17 @@ const MyDocuments = () => {
     setSelectedFile(event.target.files[0]);
   };
 
+  const handleDeleteDocument = async (documentId) => {
+    try {
+      await axios.delete(`http://localhost:5005/documents/${documentId}`);
+      setDocuments((prevDocuments) =>
+        prevDocuments.filter((doc) => doc._id !== documentId)
+      );
+    } catch (error) {
+      console.error("Error deleting document:", error);
+    }
+  };
+
   const handleFileUpload = async (event) => {
     event.preventDefault();
     if (!selectedFile || !user) return;
@@ -82,8 +93,7 @@ const MyDocuments = () => {
           <DocumentCard
             key={document._id}
             document={document}
-            setDocuments={setDocuments}
-            documents={documents}
+            onDelete={() => handleDeleteDocument(document._id)} // Pass the onDelete handler
           />
         ))}
       </div>

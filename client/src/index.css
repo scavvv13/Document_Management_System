@@ -12,10 +12,6 @@ primary {
   background-color: rgb(255, 61, 61);
 }
 
-button {
-  @apply bg-gray-300;
-}
-
 button.primary {
   background-color: rgb(255, 61, 61);
   @apply p-2 w-full text-white rounded-2xl;

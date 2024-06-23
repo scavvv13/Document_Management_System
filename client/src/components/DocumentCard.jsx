@@ -1,5 +1,6 @@
 import axios from "axios";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import DocumentPreviewModal from "./DocumentPreviewModal";
 
 const DocumentCard = ({ document, onDelete }) => {
   const downloadLinkRef = useRef(null);
