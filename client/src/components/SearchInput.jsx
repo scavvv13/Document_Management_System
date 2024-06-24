@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import axios from "axios";
 
 const SearchInput = ({
   value,
@@ -32,10 +33,15 @@ const SearchInput = ({
     };
   }, []);
 
-  const handleSuggestionClick = (suggestionValue) => {
-    onChange(suggestionValue); // Update search query with suggestion
-    onSearch(); // Trigger search
-    clearSearch(); // Close suggestion dropdown
+  const handleSuggestionClick = async (suggestionValue) => {
+    try {
+      onChange(suggestionValue); // Update search query with suggestion
+      await onSearch(); // Trigger search
+      clearSearch(); // Close suggestion dropdown
+    } catch (error) {
+      console.error("Error handling suggestion click:", error);
+      // Handle error gracefully (e.g., display error message to user)
+    }
   };
 
   return (

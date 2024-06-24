@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import SearchInput from "./SearchInput"; // New component for search input
+import SearchInput from "./SearchInput";
 import SearchResultsModal from "./SearchResultsModal";
 import UserDocumentsModal from "./UserDocumentsModal";
 import { UserContext } from "../UserContext";
 
-export default function Header() {
-  const { user } = useContext(UserContext);
+const Header = () => {
+  const { user, isAdmin } = useContext(UserContext);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -48,21 +48,19 @@ export default function Header() {
   const handleSearch = async () => {
     try {
       if (searchQuery.trim() !== "") {
-        console.log("Search Query:", searchQuery); // Debugging line
         const response = await axios.get("/global-search", {
           params: { query: searchQuery },
         });
-        console.log("Search Results:", response.data); // Debugging line
         setSearchResults(response.data);
         setIsSearchModalOpen(true);
       } else {
         setSearchResults([]);
-        setIsSearchModalOpen(true); // Ensure modal opens to show "No results found."
+        setIsSearchModalOpen(true);
       }
     } catch (error) {
       console.error("Error fetching search results:", error);
       setSearchResults([]);
-      setIsSearchModalOpen(true); // Ensure modal opens on error to show "No results found."
+      setIsSearchModalOpen(true);
     }
   };
 
@@ -73,7 +71,7 @@ export default function Header() {
 
   const closeSearchModal = () => {
     setIsSearchModalOpen(false);
-    setSearchQuery(""); // Clear search query when closing modal
+    setSearchQuery("");
   };
 
   const closeUserDocumentsModal = () => {
@@ -86,7 +84,6 @@ export default function Header() {
 
   return (
     <div className="flex justify-between items-center h-16 px-4">
-      {/* Search Input Component */}
       <SearchInput
         value={searchQuery}
         onChange={handleInputChange}
@@ -95,7 +92,6 @@ export default function Header() {
         clearSearch={() => setSearchQuery("")}
       />
 
-      {/* MIA Logo */}
       <div className="flex-1 flex justify-center">
         <Link to={"/"}>
           <img
@@ -108,7 +104,6 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* User Info and Authentication */}
       <div className="flex items-center gap-2 border border-gray-500 rounded-full px-3 py-1 shadow-md shadow-gray-400 h-10">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -152,11 +147,15 @@ export default function Header() {
         searchResults={searchResults}
         onUserClick={handleUserClick}
       />
-      <UserDocumentsModal
-        isOpen={isUserDocumentsModalOpen}
-        onClose={closeUserDocumentsModal}
-        user={selectedUser}
-      />
+      {isAdmin && (
+        <UserDocumentsModal
+          isOpen={isUserDocumentsModalOpen}
+          onClose={closeUserDocumentsModal}
+          user={selectedUser}
+        />
+      )}
     </div>
   );
-}
+};
+
+export default Header;

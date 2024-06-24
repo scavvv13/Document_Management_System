@@ -21,6 +21,17 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
     }
   };
 
+  const handleDeleteDocument = async (userId, documentId) => {
+    // Implement your delete logic here, e.g., calling an API endpoint
+    try {
+      await axios.delete(`/documents/${documentId}`);
+      // Assuming you want to refresh the document list after deletion
+      fetchUserDocuments(userId);
+    } catch (error) {
+      console.error("Error deleting document:", error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
