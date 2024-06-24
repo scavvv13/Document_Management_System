@@ -1,12 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import SearchResultsModal from "./SearchResultsModal"; // Importing the modal component
-import UserDocumentsModal from "./UserDocumentsModal"; // Importing the user documents modal component
+import SearchInput from "./SearchInput"; // New component for search input
+import SearchResultsModal from "./SearchResultsModal";
+import UserDocumentsModal from "./UserDocumentsModal";
 import { UserContext } from "../UserContext";
 
 export default function Header() {
-  const { user } = useContext(UserContext); // Access user from UserContext
+  const { user } = useContext(UserContext);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -21,7 +22,6 @@ export default function Header() {
 
   useEffect(() => {
     if (searchQuery.trim() !== "") {
-      // Fetch autocomplete suggestions for both users and documents
       const fetchSuggestions = async () => {
         try {
           const usersResponse = await axios.get(
@@ -36,7 +36,6 @@ export default function Header() {
           });
         } catch (error) {
           console.error("Error fetching suggestions:", error);
-          // Handle error (show error message, etc.)
         }
       };
 
@@ -48,90 +47,53 @@ export default function Header() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get("/global-search", {
-        params: { query: searchQuery },
-      });
-      setSearchResults(response.data);
-      setIsSearchModalOpen(true); // Open search results modal
+      if (searchQuery.trim() !== "") {
+        console.log("Search Query:", searchQuery); // Debugging line
+        const response = await axios.get("/global-search", {
+          params: { query: searchQuery },
+        });
+        console.log("Search Results:", response.data); // Debugging line
+        setSearchResults(response.data);
+        setIsSearchModalOpen(true);
+      } else {
+        setSearchResults([]);
+        setIsSearchModalOpen(true); // Ensure modal opens to show "No results found."
+      }
     } catch (error) {
       console.error("Error fetching search results:", error);
+      setSearchResults([]);
+      setIsSearchModalOpen(true); // Ensure modal opens on error to show "No results found."
     }
   };
 
   const handleUserClick = (user) => {
     setSelectedUser(user);
-    setIsUserDocumentsModalOpen(true); // Open user documents modal
+    setIsUserDocumentsModalOpen(true);
   };
 
   const closeSearchModal = () => {
     setIsSearchModalOpen(false);
+    setSearchQuery(""); // Clear search query when closing modal
   };
 
   const closeUserDocumentsModal = () => {
     setIsUserDocumentsModalOpen(false);
   };
 
-  const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
+  const handleInputChange = (value) => {
+    setSearchQuery(value);
   };
 
   return (
     <div className="flex justify-between items-center h-16 px-4">
-      {/* Search Inputs */}
-      <div className="flex  justify-start gap-2 border border-gray-500 rounded-full px-3 py-1 shadow-md shadow-gray-400 h-10 relative ">
-        <input
-          type="text"
-          placeholder="Search Documents"
-          value={searchQuery}
-          onChange={handleInputChange}
-          className="border-none outline-none w-full"
-        />
-        {autocompleteSuggestions.users.length > 0 && (
-          <ul className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-lg shadow-lg">
-            {autocompleteSuggestions.users.map((suggestion) => (
-              <li
-                key={suggestion._id}
-                onClick={() => setSearchQuery(suggestion.name)}
-                className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-              >
-                {suggestion.name} (User)
-              </li>
-            ))}
-          </ul>
-        )}
-        {autocompleteSuggestions.documents.length > 0 && (
-          <ul className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-lg shadow-lg">
-            {autocompleteSuggestions.documents.map((suggestion) => (
-              <li
-                key={suggestion._id}
-                onClick={() => setSearchQuery(suggestion.documentName)}
-                className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-              >
-                {suggestion.documentName} (Document)
-              </li>
-            ))}
-          </ul>
-        )}
-        <button
-          className="bg-primary p-1 rounded-full shadow-md shadow-gray-100 w-6 border border-gray-800"
-          onClick={handleSearch}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-            />
-          </svg>
-        </button>
-      </div>
+      {/* Search Input Component */}
+      <SearchInput
+        value={searchQuery}
+        onChange={handleInputChange}
+        onSearch={handleSearch}
+        suggestions={autocompleteSuggestions}
+        clearSearch={() => setSearchQuery("")}
+      />
 
       {/* MIA Logo */}
       <div className="flex-1 flex justify-center">
@@ -146,7 +108,7 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* Sign-in/Register */}
+      {/* User Info and Authentication */}
       <div className="flex items-center gap-2 border border-gray-500 rounded-full px-3 py-1 shadow-md shadow-gray-400 h-10">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +124,6 @@ export default function Header() {
             d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
           />
         </svg>
-        {/* Add conditional rendering based on user authentication */}
         <div>
           <Link to={user ? "/AccountPage" : "/LoginPage"}>
             <div className="flex pl-2 items-center">
@@ -184,15 +145,13 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Search Results Modal */}
+      {/* Modals */}
       <SearchResultsModal
         isOpen={isSearchModalOpen}
         onClose={closeSearchModal}
         searchResults={searchResults}
-        onUserClick={handleUserClick} // Pass the handler to open user documents modal
+        onUserClick={handleUserClick}
       />
-
-      {/* User Documents Modal */}
       <UserDocumentsModal
         isOpen={isUserDocumentsModalOpen}
         onClose={closeUserDocumentsModal}

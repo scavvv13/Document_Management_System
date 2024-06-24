@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import DocumentCard from "./DocumentCard";
 
 const UserDocumentsModal = ({ isOpen, onClose, user }) => {
   const [userDocuments, setUserDocuments] = useState([]);
@@ -51,17 +52,13 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
         </div>
         <div className="overflow-y-auto max-h-96">
           {userDocuments.length > 0 ? (
-            <ul>
-              {userDocuments.map((doc) => (
-                <li key={doc._id}>
-                  <h3 className="font-bold">{doc.originalname}</h3>
-                  <p>
-                    Time Uploaded: {new Date(doc.createdAt).toLocaleString()}
-                  </p>
-                  <p>Description: {doc.description}</p>
-                </li>
-              ))}
-            </ul>
+            userDocuments.map((doc) => (
+              <DocumentCard
+                key={doc._id}
+                document={doc}
+                onDelete={() => handleDeleteDocument(user._id, doc._id)}
+              />
+            ))
           ) : (
             <p>No documents found for {user?.name}.</p>
           )}

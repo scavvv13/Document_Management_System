@@ -245,13 +245,7 @@ app.get("/global-search", async (req, res) => {
         { originalname: { $regex: query, $options: "i" } },
         { description: { $regex: query, $options: "i" } },
       ],
-    });
-
-    // Populate the uploadedBy field with the user's name
-    await Document.populate(documentResults, {
-      path: "userId",
-      select: "name",
-    });
+    }).populate("userId", "name");
 
     // Search for users
     const userResults = await User.find({
@@ -267,14 +261,14 @@ app.get("/global-search", async (req, res) => {
         _id: doc._id,
         originalname: doc.originalname,
         description: doc.description,
-        uploadedBy: doc.userId.name, // Use populated userId.name as uploadedBy
-        type: "document", // Marking as document type
+        uploadedBy: doc.userId.name,
+        type: "document",
       })),
       ...userResults.map((user) => ({
         _id: user._id,
         name: user.name,
         email: user.email,
-        type: "user", // Marking as user type
+        type: "user",
       })),
     ];
 
@@ -344,6 +338,34 @@ app.delete("/users/:userId", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
+
+app.patch("/users/:id/make-admin", async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isAdmin: true },
+      { new: true }
+    );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Revoke admin rights
+app.patch("/users/:id/revoke-admin", async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isAdmin: false },
+      { new: true }
+    );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.put("/users/:userId", async (req, res) => {
   const { userId } = req.params;
   const { isAdmin } = req.body;

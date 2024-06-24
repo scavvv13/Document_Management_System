@@ -113,7 +113,7 @@ const SearchResultsModal = ({
                       <p>Uploaded By: {doc.uploadedBy}</p>
                       {/* Ensure doc.createdAt is in a valid format */}
                       <p>
-                        Time Uploaded: {doc.createdAt}
+                        Time Uploaded:{" "}
                         {new Date(doc.createdAt).toLocaleString()}
                       </p>
                     </div>
