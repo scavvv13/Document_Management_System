@@ -236,26 +236,38 @@ app.get("/users", async (req, res) => {
 });
 
 app.get("/global-search", async (req, res) => {
-  const { query } = req.query;
+  const { query, userId, isAdmin } = req.query;
 
   try {
-    // Search for documents
-    const documentResults = await Document.find({
-      $or: [
-        { originalname: { $regex: query, $options: "i" } },
-        { description: { $regex: query, $options: "i" } },
-      ],
-    }).populate("userId", "name");
+    let documentResults = [];
+    let userResults = [];
 
-    // Search for users
-    const userResults = await User.find({
+    if (isAdmin) {
+      documentResults = await Document.find({
+        $or: [
+          { originalname: { $regex: query, $options: "i" } },
+          { description: { $regex: query, $options: "i" } },
+        ],
+      }).populate("userId", "name");
+    } else {
+      // Regular user can only search their own documents
+      documentResults = await Document.find({
+        userId,
+        $or: [
+          { originalname: { $regex: query, $options: "i" } },
+          { description: { $regex: query, $options: "i" } },
+        ],
+      }).populate("userId", "name");
+    }
+
+    // Always search for users regardless of isAdmin status
+    userResults = await User.find({
       $or: [
         { name: { $regex: query, $options: "i" } },
         { email: { $regex: query, $options: "i" } },
       ],
     });
 
-    // Format results for display in the modal
     const formattedResults = [
       ...documentResults.map((doc) => ({
         _id: doc._id,

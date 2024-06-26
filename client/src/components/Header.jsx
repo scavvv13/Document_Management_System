@@ -22,24 +22,30 @@ const Header = () => {
 
   useEffect(() => {
     if (searchQuery.trim() !== "") {
+      // Function to fetch suggestions for users and documents
       const fetchSuggestions = async () => {
         try {
+          // Fetch user suggestions
           const usersResponse = await axios.get(
             `/users/suggestions?uploadedBy=${searchQuery}`
           );
+          // Fetch document suggestions
           const documentsResponse = await axios.get(
             `/documents/suggestions?documentName=${searchQuery}`
           );
+
+          // Update autocomplete suggestions state
           setAutocompleteSuggestions({
             users: usersResponse.data,
             documents: documentsResponse.data,
           });
         } catch (error) {
           console.error("Error fetching suggestions:", error);
+          // Handle error (e.g., display an error message)
         }
       };
 
-      fetchSuggestions();
+      fetchSuggestions(); // Call fetchSuggestions when searchQuery changes
     } else {
       setAutocompleteSuggestions({ users: [], documents: [] });
     }
@@ -47,39 +53,39 @@ const Header = () => {
 
   const handleSearch = async () => {
     try {
-      if (searchQuery.trim() !== "") {
-        const response = await axios.get("/global-search", {
-          params: { query: searchQuery },
-        });
-        setSearchResults(response.data);
-        setIsSearchModalOpen(true);
-      } else {
-        setSearchResults([]);
-        setIsSearchModalOpen(true);
-      }
+      const params = {
+        query: searchQuery,
+        userId: user._id, // Assuming user._id is available in context
+        isAdmin: isAdmin ? "true" : "false", // Convert boolean to string "true" or "false"
+      };
+
+      const response = await axios.get("/global-search", { params });
+
+      setSearchResults(response.data);
+      setIsSearchModalOpen(true);
     } catch (error) {
       console.error("Error fetching search results:", error);
       setSearchResults([]);
-      setIsSearchModalOpen(true);
+      setIsSearchModalOpen(true); // Consider displaying an error modal or message
     }
   };
 
   const handleUserClick = (user) => {
-    setSelectedUser(user);
-    setIsUserDocumentsModalOpen(true);
+    setSelectedUser(user); // Set selected user when user is clicked
+    setIsUserDocumentsModalOpen(true); // Open user documents modal
   };
 
   const closeSearchModal = () => {
-    setIsSearchModalOpen(false);
-    setSearchQuery("");
+    setIsSearchModalOpen(false); // Close search modal
+    setSearchQuery(""); // Clear search query
   };
 
   const closeUserDocumentsModal = () => {
-    setIsUserDocumentsModalOpen(false);
+    setIsUserDocumentsModalOpen(false); // Close user documents modal
   };
 
   const handleInputChange = (value) => {
-    setSearchQuery(value);
+    setSearchQuery(value); // Update search query on input change
   };
 
   return (

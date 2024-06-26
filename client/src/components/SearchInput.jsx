@@ -11,7 +11,6 @@ const SearchInput = ({
   const inputRef = useRef(null);
   const suggestionRef = useRef(null);
 
-  // Handle click outside suggestion dropdown to close it
   const handleClickOutside = (event) => {
     if (
       inputRef.current &&
@@ -23,11 +22,9 @@ const SearchInput = ({
     }
   };
 
-  // Effect to add click event listener when component mounts
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
-    // Clean up the event listener when component unmounts
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -35,12 +32,12 @@ const SearchInput = ({
 
   const handleSuggestionClick = async (suggestionValue) => {
     try {
-      onChange(suggestionValue); // Update search query with suggestion
+      onChange(suggestionValue); // Update input value with suggestion
       await onSearch(); // Trigger search
-      clearSearch(); // Close suggestion dropdown
+      clearSearch(); // Clear search input
     } catch (error) {
       console.error("Error handling suggestion click:", error);
-      // Handle error gracefully (e.g., display error message to user)
+      // Handle error (e.g., display error message to user)
     }
   };
 
@@ -71,10 +68,10 @@ const SearchInput = ({
           {suggestions.documents.map((suggestion) => (
             <li
               key={suggestion._id}
-              onClick={() => handleSuggestionClick(suggestion.documentName)}
+              onClick={() => handleSuggestionClick(suggestion.originalname)}
               className="px-4 py-2 cursor-pointer hover:bg-gray-100"
             >
-              {suggestion.documentName} (Document)
+              {suggestion.originalname} (Document)
             </li>
           ))}
         </ul>

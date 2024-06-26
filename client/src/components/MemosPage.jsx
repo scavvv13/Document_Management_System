@@ -9,6 +9,7 @@ const MemosPage = () => {
   const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [currentMemoId, setCurrentMemoId] = useState(null);
+  const [pinnedMemo, setPinnedMemo] = useState(null);
 
   useEffect(() => {
     const fetchMemos = async () => {
@@ -131,6 +132,9 @@ const MemosPage = () => {
           memos: memoGroup.memos.filter((memo) => memo._id !== id),
         }))
       );
+      if (pinnedMemo && pinnedMemo._id === id) {
+        setPinnedMemo(null);
+      }
     } catch (error) {
       console.error("Error deleting memo:", error);
     }
@@ -141,6 +145,14 @@ const MemosPage = () => {
     setContent(memo.content);
     setIsEditing(true);
     setCurrentMemoId(memo._id);
+  };
+
+  const handlePinMemo = (memo) => {
+    setPinnedMemo(memo);
+  };
+
+  const handleUnpinMemo = () => {
+    setPinnedMemo(null);
   };
 
   return (
@@ -175,35 +187,63 @@ const MemosPage = () => {
             </button>
           </form>
         )}
+        {pinnedMemo && (
+          <div className="mb-4">
+            <h2 className="text-xl font-bold mb-2">Pinned Memo</h2>
+            <div className="bg-white p-4 rounded shadow">
+              <h3 className="text-lg font-semibold mb-2">{pinnedMemo.title}</h3>
+              <p className="mb-2">{pinnedMemo.content}</p>
+              <p className="text-gray-500 text-sm">
+                {new Date(pinnedMemo.createdAt).toLocaleString()}
+              </p>
+              {user && user.isAdmin && (
+                <button
+                  onClick={handleUnpinMemo}
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Unpin
+                </button>
+              )}
+            </div>
+          </div>
+        )}
         {memos.map((memoGroup) => (
           <div key={memoGroup.title} className="mb-4">
             <h2 className="text-xl font-bold mb-2">{memoGroup.title}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {memoGroup.memos.map((memo) => (
-                <div key={memo._id} className="bg-white p-4 rounded shadow">
-                  <h3 className="text-lg font-semibold mb-2">{memo.title}</h3>
-                  <p className="mb-2">{memo.content}</p>
-                  <p className="text-gray-500 text-sm">
-                    {new Date(memo.createdAt).toLocaleString()}
-                  </p>
-                  {user && user.isAdmin && (
-                    <div className="flex space-x-2 mt-2">
-                      <button
-                        onClick={() => handleEditMemo(memo)}
-                        className="bg-yellow-500 text-white px-4 py-2 rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteMemo(memo._id)}
-                        className="bg-red-500 text-white px-4 py-2 rounded"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+              {memoGroup.memos
+                .filter((memo) => !pinnedMemo || memo._id !== pinnedMemo._id)
+                .map((memo) => (
+                  <div key={memo._id} className="bg-white p-4 rounded shadow">
+                    <h3 className="text-lg font-semibold mb-2">{memo.title}</h3>
+                    <p className="mb-2">{memo.content}</p>
+                    <p className="text-gray-500 text-sm">
+                      {new Date(memo.createdAt).toLocaleString()}
+                    </p>
+                    {user && user.isAdmin && (
+                      <div className="flex space-x-2 mt-2">
+                        <button
+                          onClick={() => handleEditMemo(memo)}
+                          className="bg-yellow-500 text-white px-4 py-2 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteMemo(memo._id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => handlePinMemo(memo)}
+                          className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                          Pin
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
           </div>
         ))}
