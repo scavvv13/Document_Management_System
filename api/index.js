@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const fs = require("fs");
 const path = require("path");
 const app = express(); // Creates an Express application instance
+const Notification = require("./models/Notification");
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
@@ -21,8 +22,18 @@ const bcryptSalt = bcrypt.genSaltSync(13); // Generates a salt for password hash
 //Middleware for isAdmin Authentication
 const verifyAdmin = require("./middlewares/verifyAdmin");
 
+const createNotification = async (userId, message) => {
+  try {
+    const notification = new Notification({ userId, message });
+    await notification.save();
+  } catch (error) {
+    console.error("Error creating notification:", error);
+  }
+};
+
 app.use(express.json()); // Parses incoming JSON data in requests coz json lng ang tinatanggap sa api
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
 
 // CORS Configuration
 app.use(
@@ -133,10 +144,13 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
 app.post("/upload", upload.single("file"), async (req, res) => {
   const { file } = req;
-  const userId = req.body.userId; // Get userId from the request body
+  const { userId } = req.body; // Get userId from the request body
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
 
   const newDocument = new Document({
     filename: file.filename,
@@ -149,10 +163,15 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
   try {
     await newDocument.save();
-    res.status(201).send("File uploaded successfully");
+
+    // Create notification after saving the document
+    await createNotification(userId, "Your document has been uploaded.");
+
+    // Respond to the client after both document save and notification creation
+    res.status(201).json({ message: "Document uploaded successfully" });
   } catch (error) {
     console.error("Error saving document:", error);
-    res.status(500).send(error);
+    res.status(500).json({ message: "Failed to upload document" });
   }
 });
 
@@ -425,6 +444,14 @@ app.post("/memos", async (req, res) => {
   try {
     const memo = new Memo({ title, content });
     await memo.save();
+
+    // Example: Notify all users about the new memo
+    const users = await User.find(); // Adjust this query as needed
+    const notificationPromises = users.map((user) =>
+      createNotification(user._id, `New memo "${memo.title}" has been created.`)
+    );
+    await Promise.all(notificationPromises);
+
     res.status(201).json(memo);
   } catch (error) {
     console.error("Error creating memo:", error);
@@ -471,5 +498,47 @@ app.put("/memos/:id", async (req, res) => {
   }
 });
 
-// Start the Server
-app.listen(process.env.PORT);
+// Endpoint to fetch notifications
+app.get("/notifications", async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const notifications = await Notification.find({ userId }).sort({
+      date: -1,
+    });
+    res.json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Endpoint to mark a notification as read
+app.put("/notifications/:id/read", async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const notification = await Notification.findOne({
+      _id: req.params.id,
+      userId,
+    });
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+    notification.read = true;
+    await notification.save();
+    res.json(notification);
+  } catch (error) {
+    console.error("Error updating notification:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Start the server
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
+});
