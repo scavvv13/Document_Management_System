@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import DocumentCard from "./DocumentCard";
+import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
 
 const MyDocuments = () => {
   const { user } = useContext(UserContext);
   const [documents, setDocuments] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -68,6 +70,14 @@ const MyDocuments = () => {
     }
   };
 
+  const handleTitleClick = (document) => {
+    setSelectedDocument(document);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedDocument(null);
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -93,10 +103,12 @@ const MyDocuments = () => {
           <DocumentCard
             key={document._id}
             document={document}
-            onDelete={() => handleDeleteDocument(document._id)} // Pass the onDelete handler
+            onDelete={() => handleDeleteDocument(document._id)}
+            onTitleClick={handleTitleClick}
           />
         ))}
       </div>
+      <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
     </div>
   );
 };

@@ -196,10 +196,12 @@ app.get("/documents/:documentId/content", async (req, res) => {
 });
 
 app.get("/documents", async (req, res) => {
-  const userId = req.query.userId; // Get userId from the query parameters
+  const userId = req.query.userId;
   console.log("Fetching documents for user ID:", userId);
   try {
-    const documents = await Document.find({ userId });
+    const documents = await Document.find({
+      $or: [{ userId: userId }, { sharedWith: userId }],
+    }).populate("sharedWith", "email"); // Populate sharedWith with user emails
     res.status(200).json(documents);
   } catch (err) {
     console.error("Error fetching documents:", err);
@@ -377,6 +379,10 @@ app.patch("/users/:id/make-admin", async (req, res) => {
       { isAdmin: true },
       { new: true }
     );
+
+    // Create notification for the user
+    await createNotification(user._id, `You have been granted admin rights.`);
+
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -391,12 +397,15 @@ app.patch("/users/:id/revoke-admin", async (req, res) => {
       { isAdmin: false },
       { new: true }
     );
+
+    // Create notification for the user
+    await createNotification(user._id, `Your admin rights have been revoked.`);
+
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
-
 app.put("/users/:userId", async (req, res) => {
   const { userId } = req.params;
   const { isAdmin } = req.body;
@@ -538,6 +547,43 @@ app.put("/notifications/:id/read", async (req, res) => {
   }
 });
 
+// Add this route to your existing routes
+
+app.post("/api/documents/:documentId/share", async (req, res) => {
+  const { documentId } = req.params;
+  const { email } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the document by ID
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    // Add user to sharedWith list if not already shared
+    if (!document.sharedWith.includes(user._id)) {
+      document.sharedWith.push(user._id);
+      await document.save();
+    }
+
+    // Create a notification for the user
+    await createNotification(
+      user._id,
+      `A document has been shared with you: ${document.originalname}`
+    );
+
+    res.status(200).json({ message: `Document shared with ${email}` });
+  } catch (error) {
+    console.error("Error sharing document:", error);
+    res.status(500).json({ message: "Error sharing document" });
+  }
+});
 // Start the server
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

@@ -1,25 +1,59 @@
 import React from "react";
-import { Worker, Viewer } from "@react-pdf-viewer/core";
-import "@react-pdf-viewer/core/lib/styles/index.css";
-import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-const DocumentPreviewModal = ({ url, onClose }) => {
+const DocumentPreviewModal = ({ document, onClose }) => {
+  if (!document) {
+    return null;
+  }
+
+  // Function to render sharedWith users' emails
+  const renderSharedWith = () => {
+    if (document.sharedWith.length === 0) {
+      return (
+        <p>
+          <strong>Shared With:</strong> No one
+        </p>
+      );
+    } else {
+      return (
+        <div>
+          <strong>Shared With:</strong>
+          <ul>
+            {document.sharedWith.map((user) => (
+              <li key={user._id}>{user.email}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="bg-white rounded-lg shadow-lg p-4 z-10 max-w-3xl w-full">
-        <div className="flex justify-end">
-          <button className="text-red-500 hover:text-red-700" onClick={onClose}>
-            Close
-          </button>
-        </div>
-        <div className="w-full h-96">
-          <Worker
-            workerUrl={`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`}
-          >
-            <Viewer fileUrl={url} />
-          </Worker>
-        </div>
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-1/2">
+        <h2 className="text-xl font-bold mb-4">{document.originalname}</h2>
+        <p>
+          <strong>Filename:</strong> {document.filename}
+        </p>
+        <p>
+          <strong>Content Type:</strong> {document.contentType}
+        </p>
+        <p>
+          <strong>Size:</strong> {(document.size / 1024).toFixed(2)} KB
+        </p>
+        <p>
+          <strong>Path:</strong> {document.path}
+        </p>
+        <p>
+          <strong>Created At:</strong>{" "}
+          {new Date(document.createdAt).toLocaleString()}
+        </p>
+        {renderSharedWith()}
+        <button
+          onClick={onClose}
+          className="bg-red-500 text-white p-2 rounded mt-4"
+        >
+          Close
+        </button>
       </div>
     </div>
   );
