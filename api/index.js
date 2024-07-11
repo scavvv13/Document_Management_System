@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const app = express(); // Creates an Express application instance
 const Notification = require("./models/Notification");
+const Folder = require("./models/Folder");
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
@@ -144,9 +145,10 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
 app.post("/upload", upload.single("file"), async (req, res) => {
   const { file } = req;
-  const { userId } = req.body; // Get userId from the request body
+  const { userId, folderId } = req.body; // Get userId and folderId from the request body
 
   if (!userId) {
     return res.status(400).json({ message: "userId is required" });
@@ -159,6 +161,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     size: file.size,
     path: file.path,
     userId: new mongoose.Types.ObjectId(userId),
+    folderId: folderId ? new mongoose.Types.ObjectId(folderId) : null,
   });
 
   try {
@@ -172,6 +175,41 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   } catch (error) {
     console.error("Error saving document:", error);
     res.status(500).json({ message: "Failed to upload document" });
+  }
+});
+
+app.get("/folders/:folderId/documents", async (req, res) => {
+  const { folderId } = req.params;
+
+  try {
+    const documents = await Document.find({ folderId: folderId });
+    res.status(200).json(documents);
+  } catch (error) {
+    console.error("Error fetching documents by folder:", error);
+    res.status(500).json({ message: "Failed to fetch documents" });
+  }
+});
+
+app.get("/folders", async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const folders = await Folder.find({ userId });
+    res.json(folders);
+  } catch (error) {
+    console.error("Error fetching folders:", error);
+    res.status(500).json({ error: "Failed to fetch folders" });
+  }
+});
+
+app.post("/createFolder", async (req, res) => {
+  const { name, parentFolderId, userId } = req.body; // Ensure userId is passed in the request body
+
+  try {
+    const newFolder = await Folder.create({ name, userId, parentFolderId });
+    res.status(201).json(newFolder);
+  } catch (error) {
+    console.error("Error creating folder:", error);
+    res.status(500).json({ error: "Failed to create folder" });
   }
 });
 
@@ -196,16 +234,15 @@ app.get("/documents/:documentId/content", async (req, res) => {
 });
 
 app.get("/documents", async (req, res) => {
-  const userId = req.query.userId;
-  console.log("Fetching documents for user ID:", userId);
+  const { userId } = req.query;
   try {
     const documents = await Document.find({
       $or: [{ userId: userId }, { sharedWith: userId }],
-    }).populate("sharedWith", "email"); // Populate sharedWith with user emails
+    }).populate("sharedWith", "email");
     res.status(200).json(documents);
-  } catch (err) {
-    console.error("Error fetching documents:", err);
-    res.status(500).send(err);
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    res.status(500).send(error);
   }
 });
 

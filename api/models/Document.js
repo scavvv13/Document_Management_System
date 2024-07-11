@@ -9,6 +9,11 @@ const documentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now },
   sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  folderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Folder",
+    default: null,
+  },
 });
 
 const Document = mongoose.model("Document", documentSchema);
