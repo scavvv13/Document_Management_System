@@ -67,7 +67,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 m-2 w-64">
+    <div className="bg-white shadow-md rounded-lg p-4 m-2 w-72 flex flex-col">
       <h3
         className="text-lg font-semibold mb-2 overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
         onClick={() => onTitleClick(document)}
@@ -80,15 +80,16 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
       <p className="text-sm text-gray-600">
         Size: {(document.size / 1024).toFixed(2)} KB
       </p>
-      <div className="flex justify-end space-x-2 pt-5">
+      <div className="flex-grow"></div>
+      <div className="flex flex-wrap justify-end gap-2 mt-4">
         <button
-          className="btn-delete text-white bg-red-500 hover:bg-red-300 px-3 py-1 focus:outline-none rounded-md"
+          className="btn-delete text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md focus:outline-none"
           onClick={handleDelete}
         >
           Delete
         </button>
         <button
-          className="btn-download text-white bg-blue-500 hover:bg-blue-300 px-3 py-1 focus:outline-none rounded-md"
+          className="btn-download text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md focus:outline-none"
           onClick={() =>
             handleDownload(
               document._id,
@@ -100,7 +101,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
           Download
         </button>
         <button
-          className="btn-share text-white bg-green-500 hover:bg-green-300 px-3 py-1 focus:outline-none rounded-md"
+          className="btn-share text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-md focus:outline-none"
           onClick={openSharePopup}
         >
           Share
@@ -122,7 +123,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
               className="border border-gray-300 p-2 rounded w-full mb-2"
               required
             />
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={closeSharePopup}
