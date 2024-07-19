@@ -186,35 +186,43 @@ const MyDocuments = () => {
           Create Folder
         </button>
       </form>
-      <div className="flex flex-wrap gap-4">
-        {folders.map((folder) => (
-          <div
-            key={folder._id}
-            onClick={() => handleFolderClick(folder)}
-            className="p-4 border rounded-lg shadow-md cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
-          >
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 mr-2 text-yellow-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M2 4a2 2 0 012-2h4.586A2 2 0 0110 3.414l1.414 1.414A2 2 0 0112 6.586V16a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" />
-              </svg>
-              <span className="font-semibold">{folder.name}</span>
+      <div className="flex">
+        <div className="w-1/4 pr-4">
+          <h2 className="text-lg font-semibold mb-2">Folders</h2>
+          {folders.map((folder) => (
+            <div
+              key={folder._id}
+              onClick={() => handleFolderClick(folder)}
+              className="p-4 border rounded-lg shadow-md cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+            >
+              <div className="flex items-center">
+                <svg
+                  className="w-6 h-6 mr-2 text-yellow-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M2 4a2 2 0 012-2h4.586A2 2 0 0110 3.414l1.414 1.414A2 2 0 0112 6.586V16a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" />
+                </svg>
+                <span className="font-semibold">{folder.name}</span>
+              </div>
             </div>
-          </div>
-        ))}
-        {!selectedFolder &&
-          documents.map((document) => (
-            <DocumentCard
-              key={document._id}
-              document={document}
-              onDelete={() => handleDeleteDocument(document._id)}
-              onTitleClick={handleTitleClick}
-            />
           ))}
+        </div>
+        <div className="w-3/4 pl-4">
+          <h2 className="text-lg font-semibold mb-2">Documents</h2>
+          <div className="flex flex-wrap gap-4">
+            {!selectedFolder &&
+              documents.map((document) => (
+                <DocumentCard
+                  key={document._id}
+                  document={document}
+                  onDelete={() => handleDeleteDocument(document._id)}
+                  onTitleClick={handleTitleClick}
+                />
+              ))}
+          </div>
+        </div>
       </div>
       <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
       {selectedFolder && (

@@ -588,6 +588,26 @@ app.put("/notifications/:id/read", async (req, res) => {
   }
 });
 
+app.delete("/notifications/:id", async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    const notification = await Notification.findOneAndDelete({
+      _id: req.params.id,
+      userId,
+    });
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+    res.json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Add this route to your existing routes
 
 app.post("/api/documents/:documentId/share", async (req, res) => {
