@@ -221,7 +221,7 @@ app.get("/documents/:documentId/content", async (req, res) => {
       return res.status(404).send("Document not found");
     }
     const filePath = path.join(__dirname, "uploads", document.filename);
-    fs.readFile(filePath, "utf8", (err, data) => {
+    fs.readFile(filePath, (err, data) => {
       if (err) {
         return res.status(500).send("Error reading file");
       }

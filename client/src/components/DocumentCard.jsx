@@ -16,7 +16,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
       const response = await axios.get(
-        `http://localhost:5005/api/documents/${documentId}/content`,
+        `http://localhost:5005/documents/${documentId}/content`,
         {
           responseType: "blob", // Important for binary data
         }
