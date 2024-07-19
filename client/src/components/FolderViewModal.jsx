@@ -2,7 +2,13 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import DocumentCard from "./DocumentCard";
 
-const FolderViewModal = ({ folder, documents, onClose, onTitleClick }) => {
+const FolderViewModal = ({
+  folder,
+  documents,
+  onClose,
+  onTitleClick,
+  onDocumentUploaded,
+}) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -16,75 +22,42 @@ const FolderViewModal = ({ folder, documents, onClose, onTitleClick }) => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("folderId", folder._id); // Append folderId for the upload
+    formData.append("userId", folder.userId); // Ensure userId is appended
+    formData.append("folderId", folder._id);
+
+    // Log form data
+    for (let [key, value] of formData.entries()) {
+    }
 
     try {
-      await axios.post("http://localhost:5005/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "http://localhost:5005/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
       setSelectedFile(null);
       fileInputRef.current.value = "";
 
-      // Optionally, you may want to refresh the documents list in the modal
-      // Example: fetchDocumentsByFolder(folder._id);
+      onDocumentUploaded(); // Trigger the document refresh callback
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
 
-  const handleDeleteDocument = async (documentId) => {
-    try {
-      await axios.delete(`http://localhost:5005/documents/${documentId}`);
-
-      // Optionally, you may want to refresh the documents list in the modal
-      // Example: fetchDocumentsByFolder(folder._id);
-    } catch (error) {
-      console.error("Error deleting document:", error);
-    }
-  };
-
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md relative">
-        <button
-          className="absolute top-2 right-2 text-pink-500 hover:text-pink-700"
-          onClick={onClose}
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-4/5 max-w-lg">
+        <h2 className="text-2xl mb-4">Folder: {folder.name}</h2>
+        <form
+          onSubmit={handleFileUpload}
+          className="mb-4 flex items-center gap-2"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <h2 className="text-xl font-semibold mb-4">{folder.name}</h2>
-
-        {/* Display documents */}
-        <div className="mb-4">
-          {documents.map((document) => (
-            <DocumentCard
-              key={document._id}
-              document={document}
-              onDelete={() => handleDeleteDocument(document._id)}
-              onTitleClick={() => onTitleClick(document)}
-            />
-          ))}
-        </div>
-
-        {/* File upload form */}
-        <form onSubmit={handleFileUpload} className="flex items-center gap-2">
           <input
             type="file"
             onChange={handleFileChange}
@@ -98,6 +71,22 @@ const FolderViewModal = ({ folder, documents, onClose, onTitleClick }) => {
             Upload
           </button>
         </form>
+        <div className="flex flex-wrap gap-4">
+          {documents.map((document) => (
+            <DocumentCard
+              key={document._id}
+              document={document}
+              onDelete={() => handleDeleteDocument(document._id)}
+              onTitleClick={onTitleClick}
+            />
+          ))}
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-4 bg-red-500 text-white p-2 rounded hover:bg-red-600"
+        >
+          Close
+        </button>
       </div>
     </div>
   );

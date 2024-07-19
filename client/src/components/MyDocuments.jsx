@@ -137,6 +137,14 @@ const MyDocuments = () => {
     fetchDocuments(); // Refresh all documents when the folder modal is closed
   };
 
+  const handleDocumentUploaded = () => {
+    if (selectedFolder) {
+      fetchDocumentsByFolder(selectedFolder._id);
+    } else {
+      fetchDocuments();
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -215,6 +223,7 @@ const MyDocuments = () => {
           documents={folderDocuments} // Pass folder documents to the modal
           onClose={handleCloseFolderModal}
           onTitleClick={handleTitleClick}
+          onDocumentUploaded={handleDocumentUploaded}
         />
       )}
     </div>

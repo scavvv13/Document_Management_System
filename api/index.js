@@ -144,27 +144,31 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 app.post("/upload", upload.single("file"), async (req, res) => {
   const { file } = req;
-  const { userId, folderId } = req.body; // Get userId and folderId from the request body
+  const { userId, folderId } = req.body;
+
+  if (!file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
 
   if (!userId) {
     return res.status(400).json({ message: "userId is required" });
   }
 
-  const newDocument = new Document({
-    filename: file.filename,
-    originalname: file.originalname,
-    contentType: file.mimetype,
-    size: file.size,
-    path: file.path,
-    userId: new mongoose.Types.ObjectId(userId),
-    folderId: folderId ? new mongoose.Types.ObjectId(folderId) : null,
-  });
-
   try {
+    const newDocument = new Document({
+      filename: file.filename,
+      originalname: file.originalname,
+      contentType: file.mimetype,
+      size: file.size,
+      path: file.path,
+      userId: new mongoose.Types.ObjectId(userId),
+      folderId: folderId ? new mongoose.Types.ObjectId(folderId) : null,
+    });
+
     await newDocument.save();
 
     // Create notification after saving the document
