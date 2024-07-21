@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
 const DocumentCard = ({ document, onDelete, onTitleClick }) => {
@@ -6,10 +6,17 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const [shareableLink, setShareableLink] = useState(null);
   const [isSharePopupOpen, setIsSharePopupOpen] = useState(false);
   const [email, setEmail] = useState("");
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    if (!document.previewImageUrl) {
+      setImageError(true);
+    }
+  }, [document.previewImageUrl]);
 
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this document?")) {
-      onDelete(); // Call parent component's delete handler
+      onDelete();
     }
   };
 
@@ -18,7 +25,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
       const response = await axios.get(
         `http://localhost:5005/documents/${documentId}/content`,
         {
-          responseType: "blob", // Important for binary data
+          responseType: "blob",
         }
       );
 
@@ -68,6 +75,18 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 m-2 w-72 flex flex-col">
+      {imageError ? (
+        <div className="h-40 w-full flex items-center justify-center bg-gray-200 rounded mb-2">
+          <span className="text-gray-500">No Preview Available</span>
+        </div>
+      ) : (
+        <img
+          src={`http://localhost:5005${document.previewImageUrl}`}
+          alt={`${document.originalname} preview`}
+          className="h-40 w-full object-cover rounded mb-2"
+          onError={() => setImageError(true)}
+        />
+      )}
       <h3
         className="text-lg font-semibold mb-2 overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
         onClick={() => onTitleClick(document)}

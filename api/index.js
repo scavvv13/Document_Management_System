@@ -35,6 +35,7 @@ const createNotification = async (userId, message) => {
 app.use(express.json()); // Parses incoming JSON data in requests coz json lng ang tinatanggap sa api
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS Configuration
 app.use(
@@ -163,6 +164,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       filename: file.filename,
       originalname: file.originalname,
       contentType: file.mimetype,
+      previewImageUrl: `/uploads/${file.filename}`, // Corrected template literal
       size: file.size,
       path: file.path,
       userId: new mongoose.Types.ObjectId(userId),

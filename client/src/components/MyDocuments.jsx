@@ -150,68 +150,88 @@ const MyDocuments = () => {
   }
 
   return (
-    <div className="p-4">
-      <form
-        onSubmit={handleFileUpload}
-        className="mb-4 flex items-center gap-2"
-      >
-        <input
-          type="file"
-          onChange={handleFileChange}
-          ref={fileInputRef}
-          className="border border-gray-300 p-2 rounded mb-2 flex-grow"
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-        >
-          Upload
-        </button>
-      </form>
-      <form
-        onSubmit={handleCreateFolder}
-        className="mb-4 flex items-center gap-2"
-      >
-        <input
-          type="text"
-          value={newFolderName}
-          onChange={(e) => setNewFolderName(e.target.value)}
-          className="border border-gray-300 p-2 rounded mb-2 flex-grow"
-          placeholder="New Folder Name"
-        />
-        <button
-          type="submit"
-          className="bg-green-500 text-white p-2 rounded hover:bg-green-600"
-        >
-          Create Folder
-        </button>
-      </form>
-      <div className="flex">
-        <div className="w-1/4 pr-4">
-          <h2 className="text-lg font-semibold mb-2">Folders</h2>
-          {folders.map((folder) => (
-            <div
-              key={folder._id}
-              onClick={() => handleFolderClick(folder)}
-              className="p-4 border rounded-lg shadow-md cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+    <div className="container mx-auto p-4 md:p-6 lg:p-8">
+      <div className="flex flex-wrap -mx-4">
+        {/* Header */}
+        <header className="w-full p-4 mb-4 bg-white shadow-md rounded flex justify-between items-center">
+          <h1 className="text-xl font-bold">My Documents</h1>
+          <div className="flex items-center gap-2">
+            <form
+              onSubmit={handleCreateFolder}
+              className="flex items-center gap-2"
             >
-              <div className="flex items-center">
-                <svg
-                  className="w-6 h-6 mr-2 text-yellow-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M2 4a2 2 0 012-2h4.586A2 2 0 0110 3.414l1.414 1.414A2 2 0 0112 6.586V16a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" />
-                </svg>
-                <span className="font-semibold">{folder.name}</span>
-              </div>
+              <input
+                type="text"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                className="border border-gray-300 p-2 rounded flex-grow"
+                placeholder="New Folder Name"
+                style={{ width: "200px" }}
+              />
+              <button
+                type="submit"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Create Folder
+              </button>
+            </form>
+            <div className="flex items-center gap-2">
+              <label className="bg-gray-200 hover:bg-gray-300 text-gray-500 font-bold py-2 px-4 rounded cursor-pointer">
+                {fileInputRef.current?.files?.[0]?.name || "No file selected"}
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                  className="hidden"
+                />
+              </label>
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleFileUpload}
+                disabled={!fileInputRef.current?.files?.[0]}
+              >
+                Upload
+              </button>
             </div>
-          ))}
-        </div>
-        <div className="w-3/4 pl-4">
-          <h2 className="text-lg font-semibold mb-2">Documents</h2>
-          <div className="flex flex-wrap gap-4">
+          </div>
+        </header>
+
+        {/* Sidebar for Folders */}
+        <aside className="w-full md:w-1/5 p-4 bg-white shadow-md rounded mb-4 md:mb-0 md:sticky md:top-4">
+          <h2 className="text-lg font-semibold mb-4">Folders</h2>
+          <ul className="list-none space-y-4">
+            {folders.map((folder) => (
+              <li key={folder._id}>
+                <div
+                  onClick={() => handleFolderClick(folder)}
+                  className="bg-gray-100 border border-gray-200 rounded p-4 cursor-pointer hover:bg-gray-200 transition"
+                >
+                  <div className="flex items-center">
+                    <svg
+                      className="w-5 h-5 mr-1 text-yellow-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M2 4a2 0 012-2h4.586A2 2 0 0110 3.414l1.414 1.414A2 2 0 0112 6.586V16a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" />
+                    </svg>
+                    <div>
+                      <span className="font-medium">{folder.name}</span>
+                      <span className="text-gray-600 text-sm block">
+                        {folder.description}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        {/* Main Content for Documents */}
+        <main className="w-full md:w-4/5 p-4 bg-white shadow-md rounded">
+          <h2 className="text-lg font-semibold mb-4">Documents</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {!selectedFolder &&
               documents.map((document) => (
                 <DocumentCard
@@ -222,13 +242,13 @@ const MyDocuments = () => {
                 />
               ))}
           </div>
-        </div>
+        </main>
       </div>
       <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
       {selectedFolder && (
         <FolderViewModal
           folder={selectedFolder}
-          documents={folderDocuments} // Pass folder documents to the modal
+          documents={folderDocuments}
           onClose={handleCloseFolderModal}
           onTitleClick={handleTitleClick}
           onDocumentUploaded={handleDocumentUploaded}

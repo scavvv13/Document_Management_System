@@ -6,6 +6,7 @@ const documentSchema = new mongoose.Schema({
   contentType: String,
   size: Number,
   path: String,
+  previewImageUrl: String,
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now },
   sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
