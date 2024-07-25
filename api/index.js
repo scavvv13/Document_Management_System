@@ -212,7 +212,7 @@ app.post("/createFolder", async (req, res) => {
 
   try {
     const newFolder = await Folder.create({ name, userId, parentFolderId });
-    res.status(201).json(newFolder);
+    res.status(201).json(newFolder); 
   } catch (error) {
     console.error("Error creating folder:", error);
     res.status(500).json({ error: "Failed to create folder" });
