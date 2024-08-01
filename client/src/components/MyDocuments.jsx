@@ -208,13 +208,20 @@ const MyDocuments = () => {
                 >
                   <div className="flex items-center">
                     <svg
-                      className="w-5 h-5 mr-1 text-yellow-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className=" size-6 text-amber-500 mr-6 fill-yellow-400"
                     >
-                      <path d="M2 4a2 0 012-2h4.586A2 2 0 0110 3.414l1.414 1.414A2 2 0 0112 6.586V16a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+                      />
                     </svg>
+
                     <div>
                       <span className="font-medium">{folder.name}</span>
                       <span className="text-gray-600 text-sm block">
@@ -231,7 +238,7 @@ const MyDocuments = () => {
         {/* Main Content for Documents */}
         <main className="w-full md:w-4/5 p-4 bg-white shadow-md rounded">
           <h2 className="text-lg font-semibold mb-4">Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {!selectedFolder &&
               documents.map((document) => (
                 <DocumentCard

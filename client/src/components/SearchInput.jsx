@@ -77,7 +77,7 @@ const SearchInput = ({
         </ul>
       )}
       <button
-        className="bg-primary p-1 rounded-full shadow-md shadow-gray-100 w-6 border border-gray-800"
+        className=" p-1 rounded-full shadow-md shadow-gray-100 w-6 border border-gray-800"
         onClick={onSearch}
       >
         <svg

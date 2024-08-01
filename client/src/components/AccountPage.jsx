@@ -42,24 +42,9 @@ const AccountPage = () => {
 
   return (
     <div>
-      <nav className="w-full mt-8 gap-2 mb-8 justify-center flex">
-        <Link className={linkClasses("profile")} to={"/AccountPage"}>
-          My Profile
-        </Link>
-        <Link
-          className={linkClasses("documents")}
-          to={"/AccountPage/documents"}
-        >
-          My Documents
-        </Link>
-        {user.isAdmin && (
-          <Link className={linkClasses("users")} to={"/AccountPage/users"}>
-            Users and Their Documents
-          </Link>
-        )}
-      </nav>
+      <nav className="w-full  gap-2 mb-15 justify-center flex"></nav>
       {subpage === "profile" && (
-        <div className="text-center max-w-lg mx-auto">
+        <div className="text-center max-w-lg mx-auto mt-10">
           Logged in as {user.name} ({user.email}) <br />
           <button onClick={logout} className="primary max-w-sm mt-8">
             Logout

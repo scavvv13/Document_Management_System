@@ -7,6 +7,7 @@ const path = require("path");
 const app = express(); // Creates an Express application instance
 const Notification = require("./models/Notification");
 const Folder = require("./models/Folder");
+const validator = require("validator");
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
@@ -212,7 +213,7 @@ app.post("/createFolder", async (req, res) => {
 
   try {
     const newFolder = await Folder.create({ name, userId, parentFolderId });
-    res.status(201).json(newFolder); 
+    res.status(201).json(newFolder);
   } catch (error) {
     console.error("Error creating folder:", error);
     res.status(500).json({ error: "Failed to create folder" });
@@ -617,23 +618,35 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Find the user by email
-    const user = await User.findOne({ email });
+    // Validate email format
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Find the user and document concurrently
+    const [user, document] = await Promise.all([
+      User.findOne({ email }).lean(),
+      Document.findById(documentId).lean(),
+    ]);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // Find the document by ID
-    const document = await Document.findById(documentId);
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    // Add user to sharedWith list if not already shared
-    if (!document.sharedWith.includes(user._id)) {
-      document.sharedWith.push(user._id);
-      await document.save();
+    // Check if user is already in the sharedWith list
+    if (document.sharedWith.includes(user._id)) {
+      return res
+        .status(200)
+        .json({ message: "Document already shared with this user" });
     }
+
+    // Update the document to add user to sharedWith list
+    await Document.findByIdAndUpdate(documentId, {
+      $addToSet: { sharedWith: user._id },
+    });
 
     // Create a notification for the user
     await createNotification(
@@ -647,6 +660,7 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
     res.status(500).json({ message: "Error sharing document" });
   }
 });
+
 // Start the server
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

@@ -74,41 +74,41 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 m-2 w-72 flex flex-col">
+    <div className="bg-white shadow-md rounded-lg p-2 m-1 w-60 flex flex-col">
       {imageError ? (
-        <div className="h-40 w-full flex items-center justify-center bg-gray-200 rounded mb-2">
-          <span className="text-gray-500">No Preview Available</span>
+        <div className="h-32 w-full flex items-center justify-center bg-gray-200 rounded mb-1">
+          <span className="text-gray-500 text-sm">No Preview Available</span>
         </div>
       ) : (
         <img
           src={`http://localhost:5005${document.previewImageUrl}`}
           alt={`${document.originalname} preview`}
-          className="h-40 w-full object-cover rounded mb-2"
+          className="h-32 w-full object-cover rounded mb-1"
           onError={() => setImageError(true)}
         />
       )}
       <h3
-        className="text-lg font-semibold mb-2 overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
+        className="text-md font-semibold mb-1 overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
         onClick={() => onTitleClick(document)}
       >
         {document.originalname}
       </h3>
-      <p className="text-sm text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
+      <p className="text-xs text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
         Type: {document.contentType}
       </p>
-      <p className="text-sm text-gray-600">
+      <p className="text-xs text-gray-600">
         Size: {(document.size / 1024).toFixed(2)} KB
       </p>
       <div className="flex-grow"></div>
-      <div className="flex flex-wrap justify-end gap-2 mt-4">
+      <div className="flex flex-wrap justify-end gap-1 mt-2">
         <button
-          className="btn-delete text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md focus:outline-none"
+          className="btn-delete text-white bg-red-500 hover:bg-red-600 px-2 py-1 text-xs rounded-md focus:outline-none"
           onClick={handleDelete}
         >
           Delete
         </button>
         <button
-          className="btn-download text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md focus:outline-none"
+          className="btn-download text-white bg-blue-500 hover:bg-blue-600 px-2 py-1 text-xs rounded-md focus:outline-none"
           onClick={() =>
             handleDownload(
               document._id,
@@ -120,7 +120,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
           Download
         </button>
         <button
-          className="btn-share text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-md focus:outline-none"
+          className="btn-share text-white bg-green-500 hover:bg-green-600 px-2 py-1 text-xs rounded-md focus:outline-none"
           onClick={openSharePopup}
         >
           Share
@@ -161,7 +161,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
         </div>
       )}
       {shareableLink && (
-        <p className="text-sm text-gray-600 mt-2">{shareableLink}</p>
+        <p className="text-xs text-gray-600 mt-1">{shareableLink}</p>
       )}
     </div>
   );

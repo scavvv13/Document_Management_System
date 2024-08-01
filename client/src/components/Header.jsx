@@ -92,16 +92,8 @@ const Header = () => {
   };
 
   return (
-    <div className="flex justify-between items-center h-16 px-4">
-      <SearchInput
-        value={searchQuery}
-        onChange={handleInputChange}
-        onSearch={handleSearch}
-        suggestions={autocompleteSuggestions}
-        clearSearch={() => setSearchQuery("")}
-      />
-
-      <div className="flex-1 flex justify-center ml-11">
+    <div className="flex items-center h-16 px-4 justify-between">
+      <div className="flex items-center">
         <Link to="/">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Manila_International_Airport_Authority_%28MIAA%29.svg/1199px-Manila_International_Airport_Authority_%28MIAA%29.svg.png"
@@ -109,6 +101,16 @@ const Header = () => {
             width="150"
           />
         </Link>
+      </div>
+
+      <div className="flex-1 mx-20">
+        <SearchInput
+          value={searchQuery}
+          onChange={handleInputChange}
+          onSearch={handleSearch}
+          suggestions={autocompleteSuggestions}
+          clearSearch={() => setSearchQuery("")}
+        />
       </div>
 
       {user && (

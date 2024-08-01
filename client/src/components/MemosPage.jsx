@@ -159,7 +159,7 @@ const MemosPage = () => {
     <div className="container mx-auto p-4 flex">
       {/* Sidebar for Add Memo */}
       <div className="w-1/4 bg-white rounded shadow-lg p-4 mb-6 mr-4">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Add Memo</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-800">Add Memo</h2>
         {user && user.isAdmin && (
           <form onSubmit={handleAddOrUpdateMemo}>
             <input
@@ -189,7 +189,7 @@ const MemosPage = () => {
 
       {/* Main Content for Displaying Memos */}
       <div className="flex-1 bg-white rounded shadow-lg p-6 mb-6">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
           Memos
         </h1>
         {pinnedMemo && (
