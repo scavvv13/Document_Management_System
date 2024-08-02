@@ -41,10 +41,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS Configuration
 app.use(
   cors({
-    origin:
-      "https://document-management-system-qgk7c9wwk-scaves-projects.vercel.app/", // Replace with your Vercel app URL
+    origin: "https://document-management-system-liard.vercel.app", // Allow your Vercel domain
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // Allows requests from the frontend port
+    credentials: true,
   })
 );
 
