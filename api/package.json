@@ -4,8 +4,9 @@
   "description": "Your backend API",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "build": "echo 'No build step required for backend'"
+    "build": "npm install",
+    "start": "node index.js"
+    
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
