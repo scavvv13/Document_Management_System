@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import DocumentCard from "./DocumentCard";
 
+const api = process.env.REACT_APP_API_URL;
 const FolderViewModal = ({
   folder,
   documents,
@@ -30,16 +31,12 @@ const FolderViewModal = ({
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5006/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${api}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
 
       setSelectedFile(null);
       fileInputRef.current.value = "";

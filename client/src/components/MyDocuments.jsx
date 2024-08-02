@@ -5,6 +5,7 @@ import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
 import FolderViewModal from "../components/FolderViewModal";
 
+const api = process.env.REACT_APP_API_URL;
 const MyDocuments = () => {
   const { user } = useContext(UserContext);
   const [documents, setDocuments] = useState([]);
@@ -25,7 +26,7 @@ const MyDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://localhost:5006/documents", {
+      const response = await axios.get(`${api}/documents`, {
         params: { userId: user._id },
       });
       setDocuments(response.data);
@@ -36,7 +37,7 @@ const MyDocuments = () => {
 
   const fetchFolders = async () => {
     try {
-      const response = await axios.get("http://localhost:5006/folders", {
+      const response = await axios.get(`${api}/folders`, {
         params: { userId: user._id },
       });
       setFolders(response.data);
@@ -47,9 +48,7 @@ const MyDocuments = () => {
 
   const fetchDocumentsByFolder = async (folderId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5006/folders/${folderId}/documents`
-      );
+      const response = await axios.get(`${api}/folders/${folderId}/documents`);
       setFolderDocuments(response.data); // Set folder documents
     } catch (error) {
       console.error("Error fetching documents by folder:", error);
@@ -62,7 +61,7 @@ const MyDocuments = () => {
 
   const handleDeleteDocument = async (documentId) => {
     try {
-      await axios.delete(`http://localhost:5006/documents/${documentId}`);
+      await axios.delete(`${api}/documents/${documentId}`);
       setDocuments((prevDocuments) =>
         prevDocuments.filter((doc) => doc._id !== documentId)
       );
@@ -83,7 +82,7 @@ const MyDocuments = () => {
     }
 
     try {
-      await axios.post("http://localhost:5006/upload", formData, {
+      await axios.post(`${api}/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -107,7 +106,7 @@ const MyDocuments = () => {
     if (!newFolderName || !user) return;
 
     try {
-      const response = await axios.post("http://localhost:5006/createFolder", {
+      const response = await axios.post(`${api}/createFolder`, {
         name: newFolderName,
         userId: user._id, // Include userId in the request body
       });

@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
+const api = process.env.REACT_APP_API_URL;
+
 const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const downloadLinkRef = useRef(null);
   const [shareableLink, setShareableLink] = useState(null);
@@ -23,7 +25,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
       const response = await axios.get(
-        `http://localhost:5006/documents/${documentId}/content`,
+        `${api}/documents/${documentId}/content`,
         {
           responseType: "blob",
         }
@@ -44,10 +46,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleShare = async (documentId, email) => {
     try {
-      await axios.post(
-        `http://localhost:5006/api/documents/${documentId}/share`,
-        { email }
-      );
+      await axios.post(`${api}/api/documents/${documentId}/share`, { email });
       setShareableLink(`Document shared with ${email}`);
     } catch (error) {
       console.error("Error sharing document:", error);
@@ -81,7 +80,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
         </div>
       ) : (
         <img
-          src={`http://localhost:5006${document.previewImageUrl}`}
+          src={`${api}${document.previewImageUrl}`}
           alt={`${document.originalname} preview`}
           className="h-32 w-full object-cover rounded mb-1"
           onError={() => setImageError(true)}
