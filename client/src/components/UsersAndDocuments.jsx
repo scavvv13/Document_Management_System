@@ -5,7 +5,6 @@ import UserDocumentsModal from "./UserDocumentsModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const api = process.env.REACT_APP_API_URL;
 const UsersAndDocuments = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -16,7 +15,9 @@ const UsersAndDocuments = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${api}/users`);
+        const response = await axios.get(
+          `https://document-management-system-ls7j.onrender.com/users`
+        );
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -76,11 +77,15 @@ const UsersAndDocuments = () => {
 
   const handleMakeAdmin = async (user) => {
     try {
-      await axios.patch(`${api}/users/${user._id}/make-admin`, null, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
+      await axios.patch(
+        `https://document-management-system-ls7j.onrender.com/users/${user._id}/make-admin`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
       toast.success(`${user.name} is now an admin.`, {
         position: "top-right", // Use string directly if POSITION is undefined
       });
@@ -94,11 +99,15 @@ const UsersAndDocuments = () => {
 
   const handleRevokeAdmin = async (user) => {
     try {
-      await axios.patch(`${api}/users/${user._id}/revoke-admin`, null, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
+      await axios.patch(
+        `https://document-management-system-ls7j.onrender.com/users/${user._id}/revoke-admin`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
       toast.success(`${user.name} is no longer an admin.`, {
         position: "top-right", // Use string directly if POSITION is undefined
       });
@@ -114,11 +123,14 @@ const UsersAndDocuments = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`${api}/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
+      await axios.delete(
+        `https://document-management-system-ls7j.onrender.com/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
 
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
     } catch (error) {

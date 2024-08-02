@@ -11,8 +11,6 @@ const MemosPage = () => {
   const [currentMemoId, setCurrentMemoId] = useState(null);
   const [pinnedMemo, setPinnedMemo] = useState(null);
 
-  const api = process.env.REACT_APP_API_URL;
-
   useEffect(() => {
     const fetchMemos = async () => {
       try {

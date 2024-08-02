@@ -1,8 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
-const api = process.env.REACT_APP_API_URL;
-
 const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const downloadLinkRef = useRef(null);
   const [shareableLink, setShareableLink] = useState(null);

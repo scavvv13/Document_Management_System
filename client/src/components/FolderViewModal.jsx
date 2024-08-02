@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import DocumentCard from "./DocumentCard";
 
-const api = process.env.REACT_APP_API_URL;
 const FolderViewModal = ({
   folder,
   documents,
