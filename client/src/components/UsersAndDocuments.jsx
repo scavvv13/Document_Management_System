@@ -15,7 +15,7 @@ const UsersAndDocuments = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:5005/users");
+        const response = await axios.get("http://localhost:5006/users");
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -76,7 +76,7 @@ const UsersAndDocuments = () => {
   const handleMakeAdmin = async (user) => {
     try {
       await axios.patch(
-        `http://localhost:5005/users/${user._id}/make-admin`,
+        `http://localhost:5006/users/${user._id}/make-admin`,
         null,
         {
           headers: {
@@ -98,7 +98,7 @@ const UsersAndDocuments = () => {
   const handleRevokeAdmin = async (user) => {
     try {
       await axios.patch(
-        `http://localhost:5005/users/${user._id}/revoke-admin`,
+        `http://localhost:5006/users/${user._id}/revoke-admin`,
         null,
         {
           headers: {
@@ -121,7 +121,7 @@ const UsersAndDocuments = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`http://localhost:5005/users/${userId}`, {
+      await axios.delete(`http://localhost:5006/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },

@@ -25,7 +25,7 @@ const MyDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://localhost:5005/documents", {
+      const response = await axios.get("http://localhost:5006/documents", {
         params: { userId: user._id },
       });
       setDocuments(response.data);
@@ -36,7 +36,7 @@ const MyDocuments = () => {
 
   const fetchFolders = async () => {
     try {
-      const response = await axios.get("http://localhost:5005/folders", {
+      const response = await axios.get("http://localhost:5006/folders", {
         params: { userId: user._id },
       });
       setFolders(response.data);
@@ -48,7 +48,7 @@ const MyDocuments = () => {
   const fetchDocumentsByFolder = async (folderId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5005/folders/${folderId}/documents`
+        `http://localhost:5006/folders/${folderId}/documents`
       );
       setFolderDocuments(response.data); // Set folder documents
     } catch (error) {
@@ -62,7 +62,7 @@ const MyDocuments = () => {
 
   const handleDeleteDocument = async (documentId) => {
     try {
-      await axios.delete(`http://localhost:5005/documents/${documentId}`);
+      await axios.delete(`http://localhost:5006/documents/${documentId}`);
       setDocuments((prevDocuments) =>
         prevDocuments.filter((doc) => doc._id !== documentId)
       );
@@ -83,7 +83,7 @@ const MyDocuments = () => {
     }
 
     try {
-      await axios.post("http://localhost:5005/upload", formData, {
+      await axios.post("http://localhost:5006/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -107,7 +107,7 @@ const MyDocuments = () => {
     if (!newFolderName || !user) return;
 
     try {
-      const response = await axios.post("http://localhost:5005/createFolder", {
+      const response = await axios.post("http://localhost:5006/createFolder", {
         name: newFolderName,
         userId: user._id, // Include userId in the request body
       });

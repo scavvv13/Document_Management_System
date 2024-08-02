@@ -23,7 +23,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
       const response = await axios.get(
-        `http://localhost:5005/documents/${documentId}/content`,
+        `http://localhost:5006/documents/${documentId}/content`,
         {
           responseType: "blob",
         }
@@ -45,7 +45,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const handleShare = async (documentId, email) => {
     try {
       await axios.post(
-        `http://localhost:5005/api/documents/${documentId}/share`,
+        `http://localhost:5006/api/documents/${documentId}/share`,
         { email }
       );
       setShareableLink(`Document shared with ${email}`);
@@ -81,7 +81,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
         </div>
       ) : (
         <img
-          src={`http://localhost:5005${document.previewImageUrl}`}
+          src={`http://localhost:5006${document.previewImageUrl}`}
           alt={`${document.originalname} preview`}
           className="h-32 w-full object-cover rounded mb-1"
           onError={() => setImageError(true)}

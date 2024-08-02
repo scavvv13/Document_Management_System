@@ -11,10 +11,12 @@ const MemosPage = () => {
   const [currentMemoId, setCurrentMemoId] = useState(null);
   const [pinnedMemo, setPinnedMemo] = useState(null);
 
+  const api = "http://localhost:5006";
+
   useEffect(() => {
     const fetchMemos = async () => {
       try {
-        const response = await axios.get("http://localhost:5005/memos");
+        const response = await axios.get(`${api}/memos`);
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
@@ -77,10 +79,10 @@ const MemosPage = () => {
 
       if (isEditing) {
         // Update memo
-        const response = await axios.put(
-          `http://localhost:5005/memos/${currentMemoId}`,
-          { title, content }
-        );
+        const response = await axios.put(`${api}/memos/${currentMemoId}`, {
+          title,
+          content,
+        });
         setMemos((prevMemos) =>
           prevMemos.map((memoGroup) => ({
             ...memoGroup,
@@ -91,7 +93,7 @@ const MemosPage = () => {
         );
       } else {
         // Add memo
-        const response = await axios.post("http://localhost:5005/memos", {
+        const response = await axios.post(`${api}/memos`, {
           title,
           content,
         });
@@ -125,7 +127,7 @@ const MemosPage = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:5005/memos/${id}`);
+      await axios.delete(`${api}/memos/${id}`);
       setMemos((prevMemos) =>
         prevMemos.map((memoGroup) => ({
           ...memoGroup,

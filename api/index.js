@@ -135,11 +135,6 @@ app.post("/logout", (req, res) => {
 const multer = require("multer");
 const Document = require("./models/Document");
 
-mongoose
-  .connect(process.env.MONGO_URL)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -665,6 +660,6 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
 });
 
 // Start the server
-app.listen(process.env.PORT || 70, () => {
+app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

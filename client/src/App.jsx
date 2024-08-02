@@ -10,7 +10,7 @@ import AccountPage from "./components/AccountPage";
 import Modal from "react-modal";
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "https://document-management-system-ls7j.onrender.com";
+axios.defaults.baseURL = "http://localhost:5006";
 
 // Set the app element for react-modal for accessibility
 Modal.setAppElement("#root");

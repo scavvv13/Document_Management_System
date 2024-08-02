@@ -31,7 +31,7 @@ const FolderViewModal = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:5005/upload",
+        "http://localhost:5006/upload",
         formData,
         {
           headers: {
