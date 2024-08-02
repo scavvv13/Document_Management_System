@@ -31,12 +31,16 @@ const FolderViewModal = ({
     }
 
     try {
-      const response = await axios.post(`${api}/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `https://document-management-system-ls7j.onrender.com/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
       setSelectedFile(null);
       fileInputRef.current.value = "";

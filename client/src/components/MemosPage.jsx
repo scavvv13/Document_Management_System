@@ -16,7 +16,9 @@ const MemosPage = () => {
   useEffect(() => {
     const fetchMemos = async () => {
       try {
-        const response = await axios.get(`${api}/memos`);
+        const response = await axios.get(
+          `https://document-management-system-ls7j.onrender.com/memos`
+        );
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
@@ -79,10 +81,13 @@ const MemosPage = () => {
 
       if (isEditing) {
         // Update memo
-        const response = await axios.put(`${api}/memos/${currentMemoId}`, {
-          title,
-          content,
-        });
+        const response = await axios.put(
+          `https://document-management-system-ls7j.onrender.com/memos/${currentMemoId}`,
+          {
+            title,
+            content,
+          }
+        );
         setMemos((prevMemos) =>
           prevMemos.map((memoGroup) => ({
             ...memoGroup,
@@ -93,10 +98,13 @@ const MemosPage = () => {
         );
       } else {
         // Add memo
-        const response = await axios.post(`${api}/memos`, {
-          title,
-          content,
-        });
+        const response = await axios.post(
+          `https://document-management-system-ls7j.onrender.com/memos`,
+          {
+            title,
+            content,
+          }
+        );
         setMemos((prevMemos) => [
           {
             title: "Today",
@@ -127,7 +135,9 @@ const MemosPage = () => {
         return;
       }
 
-      await axios.delete(`${api}/memos/${id}`);
+      await axios.delete(
+        `https://document-management-system-ls7j.onrender.com/memos/${id}`
+      );
       setMemos((prevMemos) =>
         prevMemos.map((memoGroup) => ({
           ...memoGroup,

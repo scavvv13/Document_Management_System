@@ -25,7 +25,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
       const response = await axios.get(
-        `${api}/documents/${documentId}/content`,
+        `https://document-management-system-ls7j.onrender.com/documents/${documentId}/content`,
         {
           responseType: "blob",
         }
@@ -46,7 +46,10 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleShare = async (documentId, email) => {
     try {
-      await axios.post(`${api}/api/documents/${documentId}/share`, { email });
+      await axios.post(
+        `https://document-management-system-ls7j.onrender.com/documents/${documentId}/share`,
+        { email }
+      );
       setShareableLink(`Document shared with ${email}`);
     } catch (error) {
       console.error("Error sharing document:", error);
@@ -80,7 +83,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
         </div>
       ) : (
         <img
-          src={`${api}${document.previewImageUrl}`}
+          src={`https://document-management-system-ls7j.onrender.com ${document.previewImageUrl}`}
           alt={`${document.originalname} preview`}
           className="h-32 w-full object-cover rounded mb-1"
           onError={() => setImageError(true)}
