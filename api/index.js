@@ -42,7 +42,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(
   cors({
     credentials: true, // Enables cookies for authentication (if needed)
-    origin: "http://localhost:5173", // Allows requests from the frontend port
+    origin:
+      "https://document-management-system-qgk7c9wwk-scaves-projects.vercel.app/", // Allows requests from the frontend port
   })
 );
 
