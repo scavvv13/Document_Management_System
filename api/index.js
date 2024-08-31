@@ -66,6 +66,16 @@ app.get("/test", (req, res) => {
 
 // Register User Endpoint
 app.post("/RegisterPage", async (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   const { name, email, password, isAdmin } = req.body; // Destructures user data from request body
 
   try {
@@ -85,6 +95,16 @@ app.post("/RegisterPage", async (req, res) => {
 
 //Login User Endpoint
 app.post("/LoginPage", async (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   const { email, password } = req.body;
   const LoggedInUser = await User.findOne({ email });
 
@@ -118,6 +138,15 @@ app.post("/LoginPage", async (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   const { token } = req.cookies;
   if (token) {
     verifyJWT;
