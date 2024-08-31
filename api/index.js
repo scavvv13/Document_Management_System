@@ -13,7 +13,7 @@ const { v4: uuidv4 } = require("uuid");
 app.use(
   cors({
     origin: ["https://document-management-system-liard.vercel.app"], // Allow your Vercel domain
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"], // Allow specific methods
     allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
     credentials: true, // Allow cookies and credentials
   })
@@ -150,7 +150,6 @@ app.get("/profile", (req, res) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   const { token } = req.cookies;
   if (token) {
-    verifyJWT;
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
       if (err) throw err;
       const { name, email, _id, isAdmin } = await User.findById(userData.id);
