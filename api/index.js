@@ -8,6 +8,7 @@ const app = express(); // Creates an Express application instance
 const Notification = require("./models/Notification");
 const Folder = require("./models/Folder");
 const validator = require("validator");
+const { v4: uuidv4 } = require("uuid");
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
@@ -23,6 +24,8 @@ require("dotenv").config(); // Loads environment variables from .env file
 const bcryptSalt = bcrypt.genSaltSync(13); // Generates a salt for password hashing
 //Middleware for isAdmin Authentication
 const verifyAdmin = require("./middlewares/verifyAdmin");
+const multer = require("multer");
+const Document = require("./models/Document");
 
 const createNotification = async (userId, message) => {
   try {
@@ -41,11 +44,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS Configuration
 app.use(
   cors({
-    origin: [
-      "https://document-management-system-liard.vercel.app",
-      "103.252.35.202",
-    ], // Allow your Vercel domain
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: ["http://localhost:5173"], // Allow your Vercel domain
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
@@ -119,6 +119,7 @@ app.post("/LoginPage", async (req, res) => {
 app.get("/profile", (req, res) => {
   const { token } = req.cookies;
   if (token) {
+    verifyJWT;
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
       if (err) throw err;
       const { name, email, _id, isAdmin } = await User.findById(userData.id);
@@ -133,24 +134,45 @@ app.post("/logout", (req, res) => {
   res.cookie("token", "").json(true);
 });
 
-// Starts the server on the PORT environment variable
+const upload = multer({ storage: multer.memoryStorage() });
+const AWS = require("aws-sdk");
 
-//TESTIN--------------------------------------------
-const multer = require("multer");
-const Document = require("./models/Document");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+const s3 = new AWS.S3({
+  accessKeyId: process.env.R2_ACCESS_KEY_ID,
+  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  endpoint: "https://0caeaf1335d916eb43eaceecf2663078.r2.cloudflarestorage.com", // Replace with your Cloudflare R2 endpoint
+  region: "auto",
+  s3ForcePathStyle: true,
+  signatureVersion: "v4",
 });
 
-const upload = multer({ storage: storage });
+const generateSignedUrl = (bucketName, key, expiresIn = 60) => {
+  const params = {
+    Bucket: bucketName,
+    Key: key, // Ensure this matches the key used during upload
+    Expires: expiresIn,
+  };
+  return s3.getSignedUrl("getObject", params);
+};
+
+app.get("/documents/:documentId/signed-url", async (req, res) => {
+  const documentId = req.params.documentId;
+  const document = await Document.findById(documentId);
+
+  if (!document) {
+    return res.status(404).json({ error: "Document not found" });
+  }
+
+  // Ensure this key corresponds to the file stored in R2
+  const signedUrl = generateSignedUrl(
+    process.env.R2_BUCKET_NAME,
+    document.filename
+  );
+  res.json({ signedUrl });
+});
 
 app.post("/upload", upload.single("file"), async (req, res) => {
+  verifyJWT;
   const { file } = req;
   const { userId, folderId } = req.body;
 
@@ -163,13 +185,25 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   }
 
   try {
+    // Upload file to R2
+    const r2Response = await s3
+      .upload({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: file.originalname, // Use originalname or another key based on your needs
+        Body: file.buffer, // File buffer from multer
+        ContentType: file.mimetype,
+      })
+      .promise();
+
+    const fileUrl = `https://${process.env.R2_BUCKET_NAME}.r2.cloudflarestorage.com/${file.originalname}`;
+
     const newDocument = new Document({
-      filename: file.filename,
+      filename: file.originalname,
       originalname: file.originalname,
       contentType: file.mimetype,
-      previewImageUrl: `/uploads/${file.filename}`, // Corrected template literal
+      previewImageUrl: fileUrl, // Save the full URL here
       size: file.size,
-      path: file.path,
+      path: file.path, // This might not be needed for cloud storage
       userId: new mongoose.Types.ObjectId(userId),
       folderId: folderId ? new mongoose.Types.ObjectId(folderId) : null,
     });
@@ -180,10 +214,60 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     await createNotification(userId, "Your document has been uploaded.");
 
     // Respond to the client after both document save and notification creation
-    res.status(201).json({ message: "Document uploaded successfully" });
+    res.status(201).json({
+      message: "Document uploaded successfully",
+      document: newDocument,
+    });
   } catch (error) {
     console.error("Error saving document:", error);
     res.status(500).json({ message: "Failed to upload document" });
+  }
+});
+
+app.get("/documents/:documentId/content", async (req, res) => {
+  const { documentId } = req.params;
+
+  try {
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return res.status(404).send("Document not found");
+    }
+
+    // Get the file from R2
+    const params = {
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: document.filename,
+    };
+
+    s3.getObject(params, (err, data) => {
+      if (err) {
+        console.error("Error fetching file from R2:", err);
+        return res.status(500).send("Error fetching file");
+      }
+      // Send the file data as the response
+      res.setHeader("Content-Type", document.contentType);
+      res.send(data.Body);
+    });
+  } catch (error) {
+    console.error("Error fetching document content:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
+app.get("/documents", async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    // Query documents based on userId or sharedWith field
+    const documents = await Document.find({
+      $or: [{ userId: userId }, { sharedWith: userId }],
+    }).populate("sharedWith", "email");
+
+    // Return documents with preview URLs
+    res.status(200).json(documents);
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    res.status(500).send("Error fetching documents");
   }
 });
 
@@ -219,39 +303,6 @@ app.post("/createFolder", async (req, res) => {
   } catch (error) {
     console.error("Error creating folder:", error);
     res.status(500).json({ error: "Failed to create folder" });
-  }
-});
-
-app.get("/documents/:documentId/content", async (req, res) => {
-  const { documentId } = req.params;
-  try {
-    const document = await Document.findById(documentId);
-    if (!document) {
-      return res.status(404).send("Document not found");
-    }
-    const filePath = path.join(__dirname, "uploads", document.filename);
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        return res.status(500).send("Error reading file");
-      }
-      res.send(data);
-    });
-  } catch (error) {
-    console.error("Error fetching document content:", error);
-    res.status(500).send("Internal server error");
-  }
-});
-
-app.get("/documents", async (req, res) => {
-  const { userId } = req.query;
-  try {
-    const documents = await Document.find({
-      $or: [{ userId: userId }, { sharedWith: userId }],
-    }).populate("sharedWith", "email");
-    res.status(200).json(documents);
-  } catch (error) {
-    console.error("Error fetching documents:", error);
-    res.status(500).send(error);
   }
 });
 
@@ -369,20 +420,23 @@ app.delete("/documents/:documentId", async (req, res) => {
       return res.status(404).send("Document not found");
     }
 
-    // Delete document from database
+    // Delete document from the database
     await Document.findByIdAndDelete(documentId);
 
-    // Delete document from uploads directory
-    const filePath = path.join(__dirname, "uploads", document.filename);
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting file:", err);
-        return res.status(500).send("Error deleting file");
-      }
-      console.log("File deleted successfully");
-    });
+    // Delete document from R2 bucket
+    const deleteParams = {
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: document.filename,
+    };
 
-    res.status(200).send("Document deleted successfully");
+    s3.deleteObject(deleteParams, (err, data) => {
+      if (err) {
+        console.error("Error deleting file from R2:", err);
+        return res.status(500).send("Error deleting file from R2");
+      }
+      console.log("File deleted successfully from R2");
+      res.status(200).send("Document deleted successfully");
+    });
   } catch (error) {
     console.error("Error deleting document:", error);
     res.status(500).send("Internal server error");

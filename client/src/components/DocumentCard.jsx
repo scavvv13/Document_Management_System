@@ -7,10 +7,22 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const [isSharePopupOpen, setIsSharePopupOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [imageError, setImageError] = useState(false);
+  const [signedImageUrl, setSignedImageUrl] = useState(null);
 
   useEffect(() => {
-    if (!document.previewImageUrl) {
-      setImageError(true);
+    const fetchSignedUrl = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5006/documents/${document._id}/signed-url`
+        );
+        setSignedImageUrl(response.data.signedUrl);
+      } catch (error) {
+        console.error("Error fetching signed URL:", error);
+      }
+    };
+
+    if (document.previewImageUrl) {
+      fetchSignedUrl();
     }
   }, [document.previewImageUrl]);
 
@@ -23,7 +35,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
       const response = await axios.get(
-        `https://document-management-system-ls7j.onrender.com/documents/${documentId}/content`,
+        `http://localhost:5006/documents/${documentId}/content`,
         {
           responseType: "blob",
         }
@@ -44,10 +56,9 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleShare = async (documentId, email) => {
     try {
-      await axios.post(
-        `https://document-management-system-ls7j.onrender.com/documents/${documentId}/share`,
-        { email }
-      );
+      await axios.post(`http://localhost:5006/documents/${documentId}/share`, {
+        email,
+      });
       setShareableLink(`Document shared with ${email}`);
     } catch (error) {
       console.error("Error sharing document:", error);
@@ -75,16 +86,16 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-2 m-1 w-60 flex flex-col">
-      {imageError ? (
+      {imageError || !signedImageUrl ? (
         <div className="h-32 w-full flex items-center justify-center bg-gray-200 rounded mb-1">
           <span className="text-gray-500 text-sm">No Preview Available</span>
         </div>
       ) : (
         <img
-          src={`https://document-management-system-ls7j.onrender.com ${document.previewImageUrl}`}
+          src={signedImageUrl}
           alt={`${document.originalname} preview`}
           className="h-32 w-full object-cover rounded mb-1"
-          onError={() => setImageError(true)}
+          onError={() => setImageError(true)} // Set image error if loading fails
         />
       )}
       <h3
