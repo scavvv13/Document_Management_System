@@ -18,7 +18,20 @@ app.use(
     credentials: true,
   })
 );
-app.options("*", cors()); // enable preflight requests for all routes
+
+app.options("*", (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.sendStatus(200);
+});
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
