@@ -12,27 +12,11 @@ const { v4: uuidv4 } = require("uuid");
 
 app.use(
   cors({
-    origin: "https://document-management-system-liard.vercel.app", // replace with your frontend's exact origin
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: "https://document-management-system-liard.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     credentials: true, // this allows cookies and other credentials to be sent
-    allowedHeaders: "*", // Allow all headers
-    credentials: true,
   })
 );
-
-app.options("*", (req, res) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.sendStatus(200);
-});
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
@@ -82,16 +66,6 @@ app.get("/test", (req, res) => {
 
 // Register User Endpoint
 app.post("/RegisterPage", async (req, res) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
   const { name, email, password, isAdmin } = req.body; // Destructures user data from request body
 
   try {
@@ -111,16 +85,6 @@ app.post("/RegisterPage", async (req, res) => {
 
 //Login User Endpoint
 app.post("/LoginPage", async (req, res) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
   const { email, password } = req.body;
   const LoggedInUser = await User.findOne({ email });
 
@@ -154,15 +118,6 @@ app.post("/LoginPage", async (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   const { token } = req.cookies;
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
