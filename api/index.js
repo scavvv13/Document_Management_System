@@ -44,9 +44,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS Configuration
 app.use(
   cors({
-    origin: ["https://document-management-system-liard.vercel.app/"], // Allow your Vercel domain
-    allowedHeaders: true,
-    credentials: true,
+    origin: ["https://document-management-system-liard.vercel.app"], // Allow your Vercel domain
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+    credentials: true, // Allow cookies and credentials
   })
 );
 
