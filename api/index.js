@@ -12,10 +12,10 @@ const { v4: uuidv4 } = require("uuid");
 
 app.use(
   cors({
-    origin: ["https://document-management-system-liard.vercel.app"], // Allow your Vercel domain
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"], // Allow specific methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
-    credentials: true, // Allow cookies and credentials
+    origin: "*", // Allow all origins (for testing only, not recommended for production)
+    methods: "*", // Allow all methods
+    allowedHeaders: "*", // Allow all headers
+    credentials: true,
   })
 );
 app.options("*", cors()); // enable preflight requests for all routes
