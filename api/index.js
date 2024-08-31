@@ -10,6 +10,15 @@ const Folder = require("./models/Folder");
 const validator = require("validator");
 const { v4: uuidv4 } = require("uuid");
 
+app.use(
+  cors({
+    origin: ["https://document-management-system-liard.vercel.app"], // Allow your Vercel domain
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+    credentials: true, // Allow cookies and credentials
+  })
+);
+
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
 
@@ -42,14 +51,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS Configuration
-app.use(
-  cors({
-    origin: ["https://document-management-system-liard.vercel.app"], // Allow your Vercel domain
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
-    credentials: true, // Allow cookies and credentials
-  })
-);
 
 // Connect to MongoDB
 mongoose
