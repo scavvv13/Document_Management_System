@@ -15,7 +15,9 @@ const MemosPage = () => {
   useEffect(() => {
     const fetchMemos = async () => {
       try {
-        const response = await axios.get(`http://localhost:5006/memos`);
+        const response = await axios.get(
+          `https://document-management-system-1-0b91.onrender.com/memos`
+        );
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
@@ -76,7 +78,7 @@ const MemosPage = () => {
 
       if (isEditing) {
         const response = await axios.put(
-          `http://localhost:5006/memos/${currentMemoId}`,
+          `https://document-management-system-1-0b91.onrender.com/memos/${currentMemoId}`,
           {
             title,
             content,
@@ -91,10 +93,13 @@ const MemosPage = () => {
           }))
         );
       } else {
-        const response = await axios.post(`http://localhost:5006/memos`, {
-          title,
-          content,
-        });
+        const response = await axios.post(
+          `https://document-management-system-1-0b91.onrender.com/memos`,
+          {
+            title,
+            content,
+          }
+        );
         setMemos((prevMemos) => [
           {
             title: "Today",
@@ -125,7 +130,9 @@ const MemosPage = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:5006/memos/${id}`);
+      await axios.delete(
+        `https://document-management-system-1-0b91.onrender.com/memos/${id}`
+      );
       setMemos((prevMemos) =>
         prevMemos.map((memoGroup) => ({
           ...memoGroup,
