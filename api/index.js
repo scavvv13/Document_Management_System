@@ -12,8 +12,9 @@ const { v4: uuidv4 } = require("uuid");
 
 app.use(
   cors({
-    origin: "*", // Allow all origins (for testing only, not recommended for production)
-    methods: "*", // Allow all methods
+    origin: "https://document-management-system-liard.vercel.app", // replace with your frontend's exact origin
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true, // this allows cookies and other credentials to be sent
     allowedHeaders: "*", // Allow all headers
     credentials: true,
   })
