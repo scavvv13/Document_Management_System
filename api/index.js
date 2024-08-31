@@ -44,7 +44,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS Configuration
 app.use(
   cors({
-    origin: ["http://localhost:5173"], // Allow your Vercel domain
+    origin: ["https://document-management-system-liard.vercel.app"], // Allow your Vercel domain
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
