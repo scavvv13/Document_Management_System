@@ -18,6 +18,7 @@ app.use(
     credentials: true, // Allow cookies and credentials
   })
 );
+app.options("*", cors()); // enable preflight requests for all routes
 
 // Models
 const User = require("./models/UserModel"); // Imports the User model from the models directory
