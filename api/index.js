@@ -42,7 +42,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS Configuration
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://document-management-system-1-0b91.onrender.com"], // Allow your Vercel domain
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 // Connect to MongoDB
 mongoose
