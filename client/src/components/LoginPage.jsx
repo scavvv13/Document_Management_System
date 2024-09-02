@@ -16,7 +16,12 @@ function LoginPage() {
     try {
       const { data } = await axios.post(
         `https://document-management-system-1-0b91.onrender.com/LoginPage`,
-        { email, password }
+        {
+          withCredentials: true,
+
+          email,
+          password,
+        }
       );
       setUser(data);
       alert("Login successful");

@@ -16,7 +16,10 @@ const MemosPage = () => {
     const fetchMemos = async () => {
       try {
         const response = await axios.get(
-          `https://document-management-system-1-0b91.onrender.com/memos`
+          `https://document-management-system-1-0b91.onrender.com/memos`,
+          {
+            withCredentials: true,
+          }
         );
         const today = new Date();
         const yesterday = new Date(today);
@@ -80,6 +83,8 @@ const MemosPage = () => {
         const response = await axios.put(
           `https://document-management-system-1-0b91.onrender.com/memos/${currentMemoId}`,
           {
+            withCredentials: true,
+
             title,
             content,
           }
@@ -96,6 +101,8 @@ const MemosPage = () => {
         const response = await axios.post(
           `https://document-management-system-1-0b91.onrender.com/memos`,
           {
+            withCredentials: true,
+
             title,
             content,
           }
@@ -131,7 +138,10 @@ const MemosPage = () => {
       }
 
       await axios.delete(
-        `https://document-management-system-1-0b91.onrender.com/memos/${id}`
+        `https://document-management-system-1-0b91.onrender.com/memos/${id}`,
+        {
+          withCredentials: true,
+        }
       );
       setMemos((prevMemos) =>
         prevMemos.map((memoGroup) => ({
