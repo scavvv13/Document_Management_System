@@ -50,6 +50,12 @@ app.use(
   })
 );
 
+const corsOptions = {
+  origin: "https://document-management-system-liard.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
+
 app.use(cors(corsOptions));
 
 // Ensure preflight requests are handled
@@ -96,7 +102,7 @@ app.post("/LoginPage", async (req, res) => {
   );
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Max-Age", "1800");
-  res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "PUT, POST, GET, DELETE, PATCH, OPTIONS"
