@@ -557,6 +557,17 @@ const Memo = require("./models/Memo");
 const UserModel = require("./models/UserModel");
 
 app.get("/memos", async (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "1800");
+  res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "PUT, POST, GET, DELETE, PATCH, OPTIONS"
+  );
   const { page = 1, limit = 10 } = req.query;
   try {
     const memos = await Memo.find()
@@ -571,6 +582,17 @@ app.get("/memos", async (req, res) => {
 });
 
 app.post("/memos", async (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "1800");
+  res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "PUT, POST, GET, DELETE, PATCH, OPTIONS"
+  );
   const { title, content } = req.body;
 
   try {
