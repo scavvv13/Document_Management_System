@@ -163,6 +163,13 @@ app.get("/profile", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   res.cookie("token", "").json(true);
 });
 
@@ -188,6 +195,13 @@ const generateSignedUrl = (bucketName, key, expiresIn = 60) => {
 };
 
 app.get("/documents/:documentId/signed-url", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const documentId = req.params.documentId;
   const document = await Document.findById(documentId);
 
@@ -204,6 +218,13 @@ app.get("/documents/:documentId/signed-url", async (req, res) => {
 });
 
 app.post("/upload", upload.single("file"), async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   verifyJWT;
   const { file } = req;
   const { userId, folderId } = req.body;
@@ -257,6 +278,13 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 });
 
 app.get("/documents/:documentId/content", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { documentId } = req.params;
 
   try {
@@ -287,6 +315,13 @@ app.get("/documents/:documentId/content", async (req, res) => {
 });
 
 app.get("/documents", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.query;
 
   try {
@@ -304,6 +339,13 @@ app.get("/documents", async (req, res) => {
 });
 
 app.get("/folders/:folderId/documents", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { folderId } = req.params;
 
   try {
@@ -316,6 +358,13 @@ app.get("/folders/:folderId/documents", async (req, res) => {
 });
 
 app.get("/folders", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.query;
   try {
     const folders = await Folder.find({ userId });
@@ -327,6 +376,13 @@ app.get("/folders", async (req, res) => {
 });
 
 app.post("/createFolder", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { name, parentFolderId, userId } = req.body; // Ensure userId is passed in the request body
 
   try {
@@ -339,6 +395,13 @@ app.post("/createFolder", async (req, res) => {
 });
 
 app.get("/users/suggestions", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const uploadedBy = req.query.uploadedBy;
 
   try {
@@ -353,6 +416,13 @@ app.get("/users/suggestions", async (req, res) => {
 });
 
 app.get("/documents/suggestions", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const documentName = req.query.documentName;
 
   try {
@@ -367,6 +437,13 @@ app.get("/documents/suggestions", async (req, res) => {
 });
 // Fetch all users with their documents
 app.get("/users", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const usersWithDocuments = await User.aggregate([
       {
@@ -386,6 +463,13 @@ app.get("/users", async (req, res) => {
 });
 
 app.get("/global-search", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { query, userId, isAdmin } = req.query;
 
   try {
@@ -443,6 +527,13 @@ app.get("/global-search", async (req, res) => {
 
 // Update the DELETE endpoint for documents
 app.delete("/documents/:documentId", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { documentId } = req.params;
 
   try {
@@ -477,6 +568,13 @@ app.delete("/documents/:documentId", async (req, res) => {
 
 // DELETE user and their documents
 app.delete("/users/:userId", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.params;
 
   try {
@@ -505,6 +603,13 @@ app.delete("/users/:userId", async (req, res) => {
 });
 
 app.patch("/users/:id/make-admin", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -523,6 +628,13 @@ app.patch("/users/:id/make-admin", async (req, res) => {
 
 // Revoke admin rights
 app.patch("/users/:id/revoke-admin", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -539,6 +651,13 @@ app.patch("/users/:id/revoke-admin", async (req, res) => {
   }
 });
 app.put("/users/:userId", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.params;
   const { isAdmin } = req.body;
 
@@ -623,6 +742,13 @@ app.post("/memos", async (req, res) => {
 });
 
 app.delete("/memos/:id", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { id } = req.params;
 
   try {
@@ -640,6 +766,13 @@ app.delete("/memos/:id", async (req, res) => {
 });
 
 app.put("/memos/:id", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { id } = req.params;
   const { title, content } = req.body;
 
@@ -663,6 +796,13 @@ app.put("/memos/:id", async (req, res) => {
 
 // Endpoint to fetch notifications
 app.get("/notifications", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const { userId } = req.query;
     if (!userId) {
@@ -680,6 +820,13 @@ app.get("/notifications", async (req, res) => {
 
 // Endpoint to mark a notification as read
 app.put("/notifications/:id/read", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const { userId } = req.body;
     if (!userId) {
@@ -702,6 +849,13 @@ app.put("/notifications/:id/read", async (req, res) => {
 });
 
 app.delete("/notifications/:id", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const { userId } = req.body;
     if (!userId) {
@@ -724,6 +878,13 @@ app.delete("/notifications/:id", async (req, res) => {
 // Add this route to your existing routes
 
 app.post("/api/documents/:documentId/share", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { documentId } = req.params;
   const { email } = req.body;
 
