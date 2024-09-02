@@ -78,6 +78,14 @@ app.post("/RegisterPage", async (req, res) => {
 
 //Login User Endpoint
 app.post("/LoginPage", async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "1800");
+  res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "PUT, POST, GET, DELETE, PATCH, OPTIONS"
+  );
   const { email, password } = req.body;
   const LoggedInUser = await User.findOne({ email });
 
@@ -111,6 +119,14 @@ app.post("/LoginPage", async (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Max-Age", "1800");
+  res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "PUT, POST, GET, DELETE, PATCH, OPTIONS"
+  );
   const { token } = req.cookies;
   if (token) {
     verifyJWT;
