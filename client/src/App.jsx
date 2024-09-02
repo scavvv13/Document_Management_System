@@ -12,7 +12,7 @@ import Modal from "react-modal";
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "https://document-management-system-ls7j.onrender.com";
 
-// Set the app element for react-modal for accessibility
+// Set the app element for react-modal for accessibilitya
 Modal.setAppElement("#root");
 
 function App() {
