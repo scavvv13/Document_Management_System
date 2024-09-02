@@ -44,16 +44,18 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS Configuration
 app.use(
   cors({
-    origin: ["https://document-management-system-liard.vercel.app/"], // Allow your Vercel domain
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true,
+    origin: "https://document-management-system-liard.vercel.app", // Allow requests from your frontend
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    credentials: true, // Allow cookies or other credentials
   })
 );
 
 const corsOptions = {
-  origin: "https://document-management-system-liard.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  origin: "https://document-management-system-liard.vercel.app", // Allow requests from your frontend
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true, // Allow cookies or other credentials
 };
 
 app.use(cors(corsOptions));
@@ -96,17 +98,13 @@ app.post("/RegisterPage", async (req, res) => {
 
 //Login User Endpoint
 app.post("/LoginPage", async (req, res) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
     "https://document-management-system-liard.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Max-Age", "1800");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "PUT, POST, GET, DELETE, PATCH, OPTIONS"
-  );
+  res.header("Access-Control-Allow-Credentials", "true");
   const { email, password } = req.body;
   const LoggedInUser = await User.findOne({ email });
 
