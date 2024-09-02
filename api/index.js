@@ -49,6 +49,7 @@ app.use(
     credentials: true,
   })
 );
+//nice
 
 // Connect to MongoDB
 mongoose
