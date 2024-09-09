@@ -84,6 +84,7 @@ const MemosPage = () => {
           `https://document-management-system-1-0b91.onrender.com/memos/${currentMemoId}`,
           {
             withCredentials: true,
+
             title,
             content,
           }
@@ -101,6 +102,7 @@ const MemosPage = () => {
           `https://document-management-system-1-0b91.onrender.com/memos`,
           {
             withCredentials: true,
+
             title,
             content,
           }
@@ -174,95 +176,153 @@ const MemosPage = () => {
     <div className="flex flex-col md:flex-row h-screen bg-gray-50">
       {/* Left section: Login */}
       {!user && (
-        <div className="md:w-1/3 flex flex-col justify-center items-center p-4 md:p-8 bg-white shadow-md">
+        <div className="w-full md:w-1/3 flex flex-col justify-center items-center p-4 md:p-8 bg-white shadow-md">
           <div className="w-full max-w-sm flex flex-col items-center">
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Manila_International_Airport_Authority_%28MIAA%29.svg/1280px-Manila_International_Airport_Authority_%28MIAA%29.svg.png"
               alt="MIAA Logo"
-              className="mb-1 mt-10 md:mt-20"
+              className="mb-1 mt-10 md:mt-20" // Adjusted for mobile view
             />
-            <h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900"></h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-900"></h2>
             <LoginPage />
           </div>
         </div>
       )}
 
       {/* Right section: Memos */}
-      <div className="flex-grow p-4 md:p-10 flex justify-center overflow-y-auto">
-        <div className="w-full max-w-3xl">
+      <div className="flex-1 p-4 md:p-10 flex justify-center overflow-y-auto">
+        <div className="w-full max-w-xl md:max-w-3xl">
           <h1 className="text-xl md:text-2xl font-semibold mb-6 md:mb-8 text-gray-900 text-center">
             Memorandum / Announcements
           </h1>
+
+          {/* Add/Edit Memo Form */}
+          {user && user.isAdmin && (
+            <div className="mb-6 md:mb-8">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
+                {isEditing ? "Edit Memo" : "Add New Memo"}
+              </h2>
+              <form onSubmit={handleAddOrUpdateMemo} className="mb-6">
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter memo title"
+                    className="w-full p-2 md:p-3 border rounded-lg"
+                  />
+                </div>
+                <div className="mb-4">
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Enter memo content"
+                    rows="5"
+                    className="w-full p-2 md:p-3 border rounded-lg"
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="submit"
+                    className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg"
+                  >
+                    {isEditing ? "Update Memo" : "Add Memo"}
+                  </button>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setTitle("");
+                        setContent("");
+                        setCurrentMemoId(null);
+                      }}
+                      className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Pinned Memo */}
           {pinnedMemo && (
             <div className="mb-6 md:mb-8">
-              <h2 className="text-lg md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
                 Pinned Memo
               </h2>
               <div className="bg-gray-100 p-4 md:p-6 rounded-lg shadow-sm">
                 <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
                   {pinnedMemo.title}
                 </h3>
-                <p className="mb-3 text-gray-700">{pinnedMemo.content}</p>
-                <p className="text-sm text-gray-500">
-                  {new Date(pinnedMemo.createdAt).toLocaleString()}
+                <p className="text-sm md:text-md text-gray-700">
+                  {pinnedMemo.content}
                 </p>
-                {user && user.isAdmin && (
+                <div className="mt-4 flex justify-between">
                   <button
-                    onClick={handleUnpinMemo}
-                    className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-lg"
+                    onClick={() => handleUnpinMemo()}
+                    className="text-sm md:text-md text-blue-500 hover:underline"
                   >
                     Unpin
                   </button>
-                )}
+                  {user && user.isAdmin && (
+                    <button
+                      onClick={() => handleDeleteMemo(pinnedMemo._id)}
+                      className="text-sm md:text-md text-red-500 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )}
 
-          {memos.map((memoGroup) => (
-            <div key={memoGroup.title} className="mb-6 md:mb-8">
-              <h2 className="text-lg md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
-                {memoGroup.title}
+          {/* Recent Memos */}
+          {memos.map((group, index) => (
+            <div key={index} className="mb-6 md:mb-8">
+              <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
+                {group.title}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {memoGroup.memos
-                  .filter((memo) => !pinnedMemo || memo._id !== pinnedMemo._id)
-                  .map((memo) => (
-                    <div
-                      key={memo._id}
-                      className="bg-gray-100 p-4 md:p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+              {group.memos.map((memo) => (
+                <div
+                  key={memo._id}
+                  className="bg-white p-4 md:p-6 rounded-lg shadow-sm mb-4"
+                >
+                  <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
+                    {memo.title}
+                  </h3>
+                  <p className="text-sm md:text-md text-gray-700">
+                    {memo.content}
+                  </p>
+                  <div className="mt-4 flex justify-between">
+                    <button
+                      onClick={() => handlePinMemo(memo)}
+                      className="text-sm md:text-md text-blue-500 hover:underline"
                     >
-                      <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
-                        {memo.title}
-                      </h3>
-                      <p className="mb-3 text-gray-700">{memo.content}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(memo.createdAt).toLocaleString()}
-                      </p>
-                      {user && user.isAdmin && (
-                        <div className="flex justify-end space-x-2 mt-4">
-                          <button
-                            onClick={() => handleEditMemo(memo)}
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 px-3 rounded-lg"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteMemo(memo._id)}
-                            className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-3 rounded-lg"
-                          >
-                            Delete
-                          </button>
-                          <button
-                            onClick={() => handlePinMemo(memo)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 rounded-lg"
-                          >
-                            Pin
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-              </div>
+                      Pin
+                    </button>
+                    {user && user.isAdmin && (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEditMemo(memo)}
+                          className="text-sm md:text-md text-green-500 hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteMemo(memo._id)}
+                          className="text-sm md:text-md text-red-500 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
         </div>

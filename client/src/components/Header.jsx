@@ -87,23 +87,23 @@ const Header = () => {
 
   const getLinkClassName = (path) => {
     return location.pathname === path
-      ? "text-xl font-bold bg-red-500 text-white rounded-full px-3 py-1"
-      : "text-xl font-bold";
+      ? "text-base sm:text-xl font-bold bg-red-500 text-white rounded-full px-3 py-1"
+      : "text-base sm:text-xl font-bold";
   };
 
   return (
-    <div className="flex items-center h-16 px-4 justify-between">
+    <div className="flex flex-col sm:flex-row items-center h-auto sm:h-16 px-4 justify-between space-y-3 sm:space-y-0">
       <div className="flex items-center">
         <Link to="/">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Manila_International_Airport_Authority_%28MIAA%29.svg/1199px-Manila_International_Airport_Authority_%28MIAA%29.svg.png"
             alt="MIA Logo"
-            width="150"
+            className="w-24 sm:w-36"
           />
         </Link>
       </div>
 
-      <div className="flex-1 mx-20">
+      <div className="flex-1 mx-4 sm:mx-20">
         <SearchInput
           value={searchQuery}
           onChange={handleInputChange}
@@ -114,7 +114,7 @@ const Header = () => {
       </div>
 
       {user && (
-        <div className="flex items-center space-x-4 mr-5">
+        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 space-x-0 sm:space-x-4 mr-5">
           <Link to="/" className={getLinkClassName("/")}>
             Home
           </Link>
@@ -126,14 +126,12 @@ const Header = () => {
           </Link>
 
           {user.isAdmin && (
-            <div>
-              <Link
-                to="/AccountPage/users"
-                className={getLinkClassName("/AccountPage/users")}
-              >
-                Users
-              </Link>
-            </div>
+            <Link
+              to="/AccountPage/users"
+              className={getLinkClassName("/AccountPage/users")}
+            >
+              Users
+            </Link>
           )}
         </div>
       )}
