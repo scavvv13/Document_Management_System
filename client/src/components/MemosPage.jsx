@@ -171,7 +171,7 @@ const MemosPage = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-white pt-10">
+    <div className="flex flex-col md:flex-row h-screen bg-white">
       {!user && (
         <div className="w-full md:w-1/3 flex flex-col justify-center items-center p-4 md:p-8 bg-gray-100 shadow-md">
           <LoginPage />
