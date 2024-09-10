@@ -59,10 +59,10 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: "https://document-management-system-liard.vercel.app", // Allow requests from your frontend
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-    credentials: true, // Allow cookies or other credentials
+    origin: "https://document-management-system-liard.vercel.app", // Allow requests from your frontend domain
+    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+    allowedHeaders: "Content-Type, Authorization",
+    credentials: true,
   })
 );
 
@@ -479,6 +479,8 @@ app.get("/users", async (req, res) => {
     res.status(500).send(err);
   }
 });
+
+app.options("*", cors());
 
 app.get("/global-search", async (req, res) => {
   res.header(
