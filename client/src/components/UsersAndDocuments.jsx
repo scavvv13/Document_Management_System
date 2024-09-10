@@ -16,7 +16,7 @@ const UsersAndDocuments = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `https://document-management-system-ls7j.onrender.com/users`
+          `https://document-management-system-1-0b91.onrender.com/users`
         );
         if (response.status === 200) {
           setUsers(response.data);
@@ -83,7 +83,7 @@ const UsersAndDocuments = () => {
   const handleMakeAdmin = async (user) => {
     try {
       await axios.patch(
-        `https://document-management-system-ls7j.onrender.com/users/${user._id}/make-admin`,
+        `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`,
         null,
         {
           headers: {
@@ -104,7 +104,7 @@ const UsersAndDocuments = () => {
   const handleRevokeAdmin = async (user) => {
     try {
       await axios.patch(
-        `https://document-management-system-ls7j.onrender.com/users/${user._id}/revoke-admin`,
+        `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`,
         null,
         {
           headers: {
@@ -127,7 +127,7 @@ const UsersAndDocuments = () => {
   const handleDeleteUser = async (userId) => {
     try {
       await axios.delete(
-        `https://document-management-system-ls7j.onrender.com/users/${userId}`,
+        `https://document-management-system-1-0b91.onrender.com/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${adminToken}`,
