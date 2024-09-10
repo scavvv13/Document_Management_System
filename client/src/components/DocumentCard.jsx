@@ -56,13 +56,11 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleShare = async (documentId, email) => {
     try {
-      await axios.post(
+      const response = await axios.post(
         `https://document-management-system-1-0b91.onrender.com/documents/${documentId}/share`,
-        {
-          email,
-        }
+        { email }
       );
-      setShareableLink(`Document shared with ${email}`);
+      setShareableLink(response.data.message);
     } catch (error) {
       console.error("Error sharing document:", error);
     }
