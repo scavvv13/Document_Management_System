@@ -18,9 +18,14 @@ const UsersAndDocuments = () => {
         const response = await axios.get(
           `https://document-management-system-ls7j.onrender.com/users`
         );
-        setUsers(response.data);
+        if (response.status === 200) {
+          setUsers(response.data);
+        } else {
+          throw new Error("Failed to fetch users");
+        }
       } catch (error) {
         console.error("Error fetching users:", error);
+        toast.error("Failed to fetch users.");
       }
     };
 
@@ -86,14 +91,13 @@ const UsersAndDocuments = () => {
           },
         }
       );
-      toast.success(`${user.name} is now an admin.`, {
-        position: "top-right", // Use string directly if POSITION is undefined
-      });
+      toast.success(`${user.name} is now an admin.`);
       setUsers((prevUsers) =>
         prevUsers.map((u) => (u._id === user._id ? { ...u, isAdmin: true } : u))
       );
     } catch (error) {
       console.error("Error making user admin:", error);
+      toast.error("Failed to make user an admin.");
     }
   };
 
@@ -108,9 +112,7 @@ const UsersAndDocuments = () => {
           },
         }
       );
-      toast.success(`${user.name} is no longer an admin.`, {
-        position: "top-right", // Use string directly if POSITION is undefined
-      });
+      toast.success(`${user.name} is no longer an admin.`);
       setUsers((prevUsers) =>
         prevUsers.map((u) =>
           u._id === user._id ? { ...u, isAdmin: false } : u
@@ -118,6 +120,7 @@ const UsersAndDocuments = () => {
       );
     } catch (error) {
       console.error("Error revoking admin status:", error);
+      toast.error("Failed to revoke admin status.");
     }
   };
 
@@ -131,10 +134,11 @@ const UsersAndDocuments = () => {
           },
         }
       );
-
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+      toast.success("User deleted successfully.");
     } catch (error) {
       console.error("Error deleting user:", error);
+      toast.error("Failed to delete user.");
     }
   };
 
@@ -151,8 +155,7 @@ const UsersAndDocuments = () => {
         onClose={() => setUserDocumentsModalOpen(false)}
         user={modalUser}
       />
-      <ToastContainer position="top-right" />{" "}
-      {/* Ensure position is set here */}
+      <ToastContainer position="top-right" />
     </div>
   );
 };
