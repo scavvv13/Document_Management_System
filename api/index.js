@@ -39,23 +39,8 @@ const createNotification = async (userId, message) => {
 app.use(express.json()); // Parses incoming JSON data in requests coz json lng ang tinatanggap sa api
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS Configuration
-
-app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
-  next();
-});
 
 app.use(
   cors({
@@ -452,16 +437,13 @@ app.get("/documents/suggestions", async (req, res) => {
 });
 // Fetch all users with their documents
 app.get("/users", async (req, res) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
     "https://document-management-system-liard.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const usersWithDocuments = await User.aggregate([
       {
@@ -588,16 +570,13 @@ app.delete("/documents/:documentId", async (req, res) => {
 
 // DELETE user and their documents
 app.delete("/users/:userId", async (req, res) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
     "https://document-management-system-liard.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.params;
 
   try {
@@ -626,16 +605,13 @@ app.delete("/users/:userId", async (req, res) => {
 });
 
 app.patch("/users/:id/make-admin", async (req, res) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
     "https://document-management-system-liard.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -654,16 +630,13 @@ app.patch("/users/:id/make-admin", async (req, res) => {
 
 // Revoke admin rights
 app.patch("/users/:id/revoke-admin", async (req, res) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
     "https://document-management-system-liard.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -680,16 +653,13 @@ app.patch("/users/:id/revoke-admin", async (req, res) => {
   }
 });
 app.put("/users/:userId", async (req, res) => {
-  res.setHeader(
+  res.header(
     "Access-Control-Allow-Origin",
     "https://document-management-system-liard.vercel.app"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.params;
   const { isAdmin } = req.body;
 
