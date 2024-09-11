@@ -3,7 +3,7 @@ import axios from "axios";
 import DocumentCard from "./DocumentCard";
 import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
-import FolderModal from "../components/FolderViewModal";
+// import FolderModal from "../components/FolderViewModal";
 import LoadingModal from "../components/LoadingModal"; // Import the LoadingModal component
 
 const MyDocuments = () => {
@@ -277,13 +277,13 @@ const MyDocuments = () => {
         <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
       )}
       {/* Folder Modal */}
-      {selectedFolder && (
-        <FolderModal
-          folder={selectedFolder}
-          onClose={handleCloseFolderModal}
-          onDocumentUploaded={handleDocumentUploaded}
-        />
-      )}
+      {/* {selectedFolder && (
+        // <FolderModal
+        //   folder={selectedFolder}
+        //   onClose={handleCloseFolderModal}
+        //   onDocumentUploaded={handleDocumentUploaded}
+        // />
+      )} */}
     </div>
   );
 };
