@@ -14,15 +14,12 @@ function LoginPage() {
   async function loginUser(event) {
     event.preventDefault();
     try {
-      const { data } = await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/LoginPage`,
-        {
-          withCredentials: true,
+      const { data } = await axios.post(`/LoginPage`, {
+        withCredentials: true,
 
-          email,
-          password,
-        }
-      );
+        email,
+        password,
+      });
       setUser(data);
       alert("Login successful");
       setRedirect(true);

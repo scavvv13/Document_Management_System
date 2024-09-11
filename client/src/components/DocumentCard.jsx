@@ -13,7 +13,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
     const fetchSignedUrl = async () => {
       try {
         const response = await axios.get(
-          `https://document-management-system-1-0b91.onrender.com/documents/${document._id}/signed-url`
+          `/documents/${document._id}/signed-url`
         );
         setSignedImageUrl(response.data.signedUrl);
       } catch (error) {
@@ -34,12 +34,9 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
-      const response = await axios.get(
-        `https://document-management-system-1-0b91.onrender.com/documents/${documentId}/content`,
-        {
-          responseType: "blob",
-        }
-      );
+      const response = await axios.get(`/documents/${documentId}/content`, {
+        responseType: "blob",
+      });
 
       const url = window.URL.createObjectURL(
         new Blob([response.data], { type: contentType })
@@ -56,10 +53,9 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleShare = async (documentId, email) => {
     try {
-      const response = await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/documents/${documentId}/share`,
-        { email }
-      );
+      const response = await axios.post(`/documents/${documentId}/share`, {
+        email,
+      });
       setShareableLink(response.data.message);
     } catch (error) {
       console.error("Error sharing document:", error);

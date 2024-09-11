@@ -27,12 +27,9 @@ const MyDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get(
-        `https://document-management-system-1-0b91.onrender.com/documents`,
-        {
-          params: { userId: user._id },
-        }
-      );
+      const response = await axios.get(`/documents`, {
+        params: { userId: user._id },
+      });
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -41,12 +38,9 @@ const MyDocuments = () => {
 
   const fetchFolders = async () => {
     try {
-      const response = await axios.get(
-        `https://document-management-system-1-0b91.onrender.com/folders`,
-        {
-          params: { userId: user._id },
-        }
-      );
+      const response = await axios.get(`/folders`, {
+        params: { userId: user._id },
+      });
       setFolders(response.data);
     } catch (error) {
       console.error("Error fetching folders:", error);
@@ -55,9 +49,7 @@ const MyDocuments = () => {
 
   const fetchDocumentsByFolder = async (folderId) => {
     try {
-      const response = await axios.get(
-        `https://document-management-system-1-0b91.onrender.com/folders/${folderId}/documents`
-      );
+      const response = await axios.get(`/folders/${folderId}/documents`);
       setFolderDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents by folder:", error);
@@ -70,9 +62,7 @@ const MyDocuments = () => {
 
   const handleDeleteDocument = async (documentId) => {
     try {
-      await axios.delete(
-        `https://document-management-system-1-0b91.onrender.com/documents/${documentId}`
-      );
+      await axios.delete(`/documents/${documentId}`);
       setDocuments((prevDocuments) =>
         prevDocuments.filter((doc) => doc._id !== documentId)
       );
@@ -98,16 +88,12 @@ const MyDocuments = () => {
     }
 
     try {
-      await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      await axios.post(`/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
       setSelectedFile(null);
       fileInputRef.current.value = "";
 
@@ -128,13 +114,10 @@ const MyDocuments = () => {
     if (!newFolderName || !user) return;
 
     try {
-      const response = await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/createFolder`,
-        {
-          name: newFolderName,
-          userId: user._id, // Include userId in the request body
-        }
-      );
+      const response = await axios.post(`/createFolder`, {
+        name: newFolderName,
+        userId: user._id, // Include userId in the request body
+      });
       setFolders((prevFolders) => [...prevFolders, response.data]);
       setNewFolderName(""); // Clear the folder name input
     } catch (error) {
