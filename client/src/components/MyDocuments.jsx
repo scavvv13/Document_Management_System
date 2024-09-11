@@ -3,7 +3,7 @@ import axios from "axios";
 import DocumentCard from "./DocumentCard";
 import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
-import LoadingModal from "../components/LoadingModal";
+import LoadingModal from "../components/LoadingModal"; // Import the LoadingModal component
 
 const MyDocuments = () => {
   const { user } = useContext(UserContext);
@@ -81,7 +81,7 @@ const MyDocuments = () => {
         prevDocuments.filter((doc) => doc._id !== documentId)
       );
       if (selectedFolder) {
-        fetchDocumentsByFolder(selectedFolder._id);
+        fetchDocumentsByFolder(selectedFolder._id); // Refresh folder documents if inside a folder
       }
     } catch (error) {
       console.error("Error deleting document:", error);
@@ -199,11 +199,12 @@ const MyDocuments = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 md:p-8 lg:p-10">
+    <div className="container mx-auto p-6">
       <LoadingModal isLoading={isLoading} message={loadingMessage} />
-      <header className="w-full p-4 mb-6 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg shadow-lg flex justify-between items-center">
-        <h1 className="text-2xl font-semibold pl-4">My Documents</h1>
-        <div className="flex items-center gap-3">
+      {/* Header */}
+      <header className="w-full p-4 mb-6 bg-white border border-gray-300 rounded-lg shadow-md flex justify-between items-center">
+        <h1 className="text-xl font-semibold">My Documents</h1>
+        <div className="flex items-center gap-4">
           <form
             onSubmit={handleCreateFolder}
             className="flex items-center gap-2"
@@ -212,47 +213,47 @@ const MyDocuments = () => {
               type="text"
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="border border-gray-300 p-2 rounded"
               placeholder="New Folder Name"
             />
             <button
               type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition"
+              className="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded"
             >
-              Create
+              Create Folder
             </button>
           </form>
-          <div className="flex items-center gap-3">
-            <label className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md cursor-pointer transition">
-              {fileInputRef.current?.files?.[0]?.name || "No file selected"}
-              <input
-                type="file"
-                onChange={handleFileChange}
-                ref={fileInputRef}
-                className="hidden"
-              />
-            </label>
-            <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition"
-              onClick={handleFileUpload}
-              disabled={!fileInputRef.current?.files?.[0]}
-            >
-              Upload
-            </button>
-          </div>
+          <label className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded cursor-pointer">
+            {fileInputRef.current?.files?.[0]?.name || "No file selected"}
+            <input
+              type="file"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              className="hidden"
+            />
+          </label>
+          <button
+            className="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded"
+            onClick={handleFileUpload}
+            disabled={!fileInputRef.current?.files?.[0]}
+          >
+            Upload
+          </button>
         </div>
       </header>
+      {/* Main Content Area */}
       <div className="flex flex-col lg:flex-row lg:space-x-6">
-        <aside className="lg:w-1/4 p-4 bg-white shadow-md rounded-md mb-4 lg:mb-0">
+        {/* Sidebar for Folders */}
+        <aside className="lg:w-1/4 p-4 bg-white shadow-md rounded-lg mb-6 lg:mb-0">
           <h2 className="text-lg font-semibold mb-4">Folders</h2>
-          <ul className="space-y-4">
+          <ul className="list-none space-y-2">
             {folders.map((folder) => (
               <li key={folder._id}>
                 <button
                   className={`w-full text-left p-2 rounded-md ${
                     selectedFolder?._id === folder._id
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-gray-100 hover:bg-gray-200"
+                      ? "bg-gray-100 text-gray-700"
+                      : "bg-white hover:bg-gray-50 text-gray-600"
                   }`}
                   onClick={() => handleFolderClick(folder)}
                 >
@@ -261,57 +262,33 @@ const MyDocuments = () => {
               </li>
             ))}
           </ul>
+          {selectedFolder && (
+            <button
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded mt-4 w-full"
+              onClick={handleDeleteFolder}
+            >
+              Delete Folder
+            </button>
+          )}
         </aside>
-        <main className="flex-1">
+        {/* Main Area for Documents */}
+        <main className="lg:w-3/4 p-4 bg-white shadow-md rounded-lg">
+          <h2 className="text-lg font-semibold mb-4">Documents</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {(selectedFolder ? folderDocuments : documents).map((doc) => (
               <DocumentCard
                 key={doc._id}
                 document={doc}
-                onTitleClick={() => handleTitleClick(doc)}
+                onClick={() => handleTitleClick(doc)}
                 onDelete={() => handleDeleteDocument(doc._id)}
               />
             ))}
           </div>
         </main>
       </div>
+      {/* Document Preview Modal */}
       {selectedDocument && (
-        <DocumentModal
-          document={selectedDocument}
-          onClose={handleCloseModal}
-          onDocumentUploaded={handleDocumentUploaded}
-        />
-      )}
-      {selectedFolder && (
-        <div className="fixed top-0 left-0 z-50 bg-black bg-opacity-50 w-full h-full flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">
-              {selectedFolder.name} - Documents
-            </h2>
-            <button
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md mb-4"
-              onClick={handleDeleteFolder}
-            >
-              Delete Folder
-            </button>
-            <button
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md"
-              onClick={handleCloseFolderModal}
-            >
-              Close
-            </button>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
-              {folderDocuments.map((doc) => (
-                <DocumentCard
-                  key={doc._id}
-                  document={doc}
-                  onTitleClick={() => handleTitleClick(doc)}
-                  onDelete={() => handleDeleteDocument(doc._id)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+        <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
       )}
     </div>
   );
