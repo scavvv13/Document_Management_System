@@ -3,19 +3,19 @@ import axios from "axios";
 import DocumentCard from "./DocumentCard";
 import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
-import LoadingModal from "../components/LoadingModal"; // Import the LoadingModal component
+import LoadingModal from "../components/LoadingModal";
 
 const MyDocuments = () => {
   const { user } = useContext(UserContext);
   const [documents, setDocuments] = useState([]);
-  const [folderDocuments, setFolderDocuments] = useState([]); // State for folder documents
+  const [folderDocuments, setFolderDocuments] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const [selectedFolder, setSelectedFolder] = useState(null); // State for selected folder
+  const [selectedFolder, setSelectedFolder] = useState(null);
   const [folders, setFolders] = useState([]);
-  const [newFolderName, setNewFolderName] = useState(""); // State for new folder name
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
-  const [loadingMessage, setLoadingMessage] = useState(""); // State for dynamic loading message
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const MyDocuments = () => {
         prevDocuments.filter((doc) => doc._id !== documentId)
       );
       if (selectedFolder) {
-        fetchDocumentsByFolder(selectedFolder._id); // Refresh folder documents if inside a folder
+        fetchDocumentsByFolder(selectedFolder._id);
       }
     } catch (error) {
       console.error("Error deleting document:", error);
@@ -100,9 +100,9 @@ const MyDocuments = () => {
       setFolders((prevFolders) =>
         prevFolders.filter((folder) => folder._id !== selectedFolder._id)
       );
-      setSelectedFolder(null); // Reset selected folder
-      setFolderDocuments([]); // Clear folder documents
-      fetchDocuments(); // Refresh all documents
+      setSelectedFolder(null);
+      setFolderDocuments([]);
+      fetchDocuments();
     } catch (error) {
       console.error("Error deleting folder:", error);
     } finally {
@@ -115,13 +115,13 @@ const MyDocuments = () => {
     if (!selectedFile || !user) return;
 
     setLoadingMessage("Uploading file...");
-    setIsLoading(true); // Show loading modal
+    setIsLoading(true);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("userId", user._id);
     if (selectedFolder) {
-      formData.append("folderId", selectedFolder._id); // Append folderId if a folder is selected
+      formData.append("folderId", selectedFolder._id);
     }
 
     try {
@@ -135,14 +135,14 @@ const MyDocuments = () => {
       fileInputRef.current.value = "";
 
       if (selectedFolder) {
-        fetchDocumentsByFolder(selectedFolder._id); // Refresh folder documents if inside a folder
+        fetchDocumentsByFolder(selectedFolder._id);
       } else {
-        fetchDocuments(); // Refresh all documents
+        fetchDocuments();
       }
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
-      setIsLoading(false); // Hide loading modal
+      setIsLoading(false);
     }
   };
 
@@ -151,19 +151,19 @@ const MyDocuments = () => {
     if (!newFolderName || !user) return;
 
     setLoadingMessage("Creating folder...");
-    setIsLoading(true); // Show loading modal
+    setIsLoading(true);
 
     try {
       const response = await axios.post(`/createFolder`, {
         name: newFolderName,
-        userId: user._id, // Include userId in the request body
+        userId: user._id,
       });
       setFolders((prevFolders) => [...prevFolders, response.data]);
-      setNewFolderName(""); // Clear the folder name input
+      setNewFolderName("");
     } catch (error) {
       console.error("Error creating folder:", error);
     } finally {
-      setIsLoading(false); // Hide loading modal
+      setIsLoading(false);
     }
   };
 
@@ -177,13 +177,13 @@ const MyDocuments = () => {
 
   const handleFolderClick = (folder) => {
     setSelectedFolder(folder);
-    fetchDocumentsByFolder(folder._id); // Fetch documents within the selected folder
+    fetchDocumentsByFolder(folder._id);
   };
 
   const handleCloseFolderModal = () => {
     setSelectedFolder(null);
-    setFolderDocuments([]); // Clear folder documents when the modal is closed
-    fetchDocuments(); // Refresh all documents when the folder modal is closed
+    setFolderDocuments([]);
+    fetchDocuments();
   };
 
   const handleDocumentUploaded = () => {
@@ -199,13 +199,11 @@ const MyDocuments = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 lg:p-8">
-      <LoadingModal isLoading={isLoading} message={loadingMessage} />{" "}
-      {/* Add the LoadingModal component */}
-      {/* Header */}
-      <header className="w-full p-4 mb-4 bg-white border border-gray-250 rounded-full shadow-md shadow-gray-400 flex justify-between items-center">
-        <h1 className="text-xl font-bold pl-6">My Documents</h1>
-        <div className="flex items-center gap-2">
+    <div className="container mx-auto p-6 md:p-8 lg:p-10">
+      <LoadingModal isLoading={isLoading} message={loadingMessage} />
+      <header className="w-full p-4 mb-6 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg shadow-lg flex justify-between items-center">
+        <h1 className="text-2xl font-semibold pl-4">My Documents</h1>
+        <div className="flex items-center gap-3">
           <form
             onSubmit={handleCreateFolder}
             className="flex items-center gap-2"
@@ -214,19 +212,18 @@ const MyDocuments = () => {
               type="text"
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              className="border border-gray-300 p-2 rounded flex-grow"
+              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               placeholder="New Folder Name"
-              style={{ width: "200px" }}
             />
             <button
               type="submit"
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition"
             >
-              Create Folder
+              Create
             </button>
           </form>
-          <div className="flex items-center gap-2 pr-7">
-            <label className="bg-gray-200 hover:bg-gray-300 text-gray-500 font-bold py-2 px-4 rounded cursor-pointer">
+          <div className="flex items-center gap-3">
+            <label className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md cursor-pointer transition">
               {fileInputRef.current?.files?.[0]?.name || "No file selected"}
               <input
                 type="file"
@@ -236,7 +233,7 @@ const MyDocuments = () => {
               />
             </label>
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition"
               onClick={handleFileUpload}
               disabled={!fileInputRef.current?.files?.[0]}
             >
@@ -245,19 +242,17 @@ const MyDocuments = () => {
           </div>
         </div>
       </header>
-      {/* Main Content Area */}
-      <div className="flex flex-col lg:flex-row lg:space-x-4">
-        {/* Sidebar for Folders */}
-        <div className="lg:w-1/4 p-4 bg-white shadow-md rounded mb-4 lg:mb-0">
+      <div className="flex flex-col lg:flex-row lg:space-x-6">
+        <aside className="lg:w-1/4 p-4 bg-white shadow-md rounded-md mb-4 lg:mb-0">
           <h2 className="text-lg font-semibold mb-4">Folders</h2>
-          <ul className="list-none space-y-4">
+          <ul className="space-y-4">
             {folders.map((folder) => (
               <li key={folder._id}>
                 <button
-                  className={`block w-full p-2 rounded-lg text-left focus:outline-none ${
+                  className={`w-full text-left p-2 rounded-md ${
                     selectedFolder?._id === folder._id
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-gray-100 hover:bg-gray-200"
                   }`}
                   onClick={() => handleFolderClick(folder)}
                 >
@@ -266,40 +261,57 @@ const MyDocuments = () => {
               </li>
             ))}
           </ul>
-          {/* Delete Folder button */}
-          {selectedFolder && (
-            <div className="mt-4">
-              <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleDeleteFolder}
-              >
-                Delete Folder
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Main Area for Documents */}
-        <div className="lg:w-3/4 p-4 bg-white shadow-md rounded">
-          <h2 className="text-lg font-semibold mb-4">Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(selectedFolder ? folderDocuments : documents).map((document) => (
+        </aside>
+        <main className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {(selectedFolder ? folderDocuments : documents).map((doc) => (
               <DocumentCard
-                key={document._id}
-                document={document}
-                onClick={() => handleTitleClick(document)}
-                onDelete={() => handleDeleteDocument(document._id)}
+                key={doc._id}
+                document={doc}
+                onTitleClick={() => handleTitleClick(doc)}
+                onDelete={() => handleDeleteDocument(doc._id)}
               />
             ))}
           </div>
-        </div>
+        </main>
       </div>
       {selectedDocument && (
         <DocumentModal
           document={selectedDocument}
           onClose={handleCloseModal}
-          onUpload={handleDocumentUploaded}
+          onDocumentUploaded={handleDocumentUploaded}
         />
+      )}
+      {selectedFolder && (
+        <div className="fixed top-0 left-0 z-50 bg-black bg-opacity-50 w-full h-full flex items-center justify-center">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">
+              {selectedFolder.name} - Documents
+            </h2>
+            <button
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md mb-4"
+              onClick={handleDeleteFolder}
+            >
+              Delete Folder
+            </button>
+            <button
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md"
+              onClick={handleCloseFolderModal}
+            >
+              Close
+            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+              {folderDocuments.map((doc) => (
+                <DocumentCard
+                  key={doc._id}
+                  document={doc}
+                  onTitleClick={() => handleTitleClick(doc)}
+                  onDelete={() => handleDeleteDocument(doc._id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
