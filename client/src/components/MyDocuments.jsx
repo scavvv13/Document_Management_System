@@ -11,7 +11,7 @@ const MyDocuments = () => {
   const [folderDocuments, setFolderDocuments] = useState([]); // State for folder documents
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedFolder, setSelectedFolder] = useState(null); // State for selected folder
   const [folders, setFolders] = useState([]);
   const [newFolderName, setNewFolderName] = useState(""); // State for new folder name
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
@@ -85,6 +85,26 @@ const MyDocuments = () => {
       }
     } catch (error) {
       console.error("Error deleting document:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteFolder = async () => {
+    if (!selectedFolder) return;
+
+    try {
+      setLoadingMessage("Deleting folder...");
+      setIsLoading(true);
+      await axios.delete(`/folders/${selectedFolder._id}`);
+      setFolders((prevFolders) =>
+        prevFolders.filter((folder) => folder._id !== selectedFolder._id)
+      );
+      setSelectedFolder(null); // Reset selected folder
+      setFolderDocuments([]); // Clear folder documents
+      fetchDocuments(); // Refresh all documents
+    } catch (error) {
+      console.error("Error deleting folder:", error);
     } finally {
       setIsLoading(false);
     }
@@ -233,63 +253,53 @@ const MyDocuments = () => {
           <ul className="list-none space-y-4">
             {folders.map((folder) => (
               <li key={folder._id}>
-                <div
+                <button
+                  className={`block w-full p-2 rounded-lg text-left focus:outline-none ${
+                    selectedFolder?._id === folder._id
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
                   onClick={() => handleFolderClick(folder)}
-                  className="bg-gray-100 border border-gray-200 rounded p-4 cursor-pointer hover:bg-gray-200 transition"
                 >
-                  <div className="flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-6 h-6 text-amber-500 mr-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3.75 7.5l.914-1.371A1.5 1.5 0 016.01 5.25h3.98a1.5 1.5 0 001.346-.829l.914-1.371A1.5 1.5 0 0113.99 2.25h4.82a1.5 1.5 0 011.497 1.586l-.077 13.628a1.5 1.5 0 01-1.497 1.586H6.01a1.5 1.5 0 01-1.346-.829L3.75 7.5z"
-                      />
-                    </svg>
-                    <span className="font-bold text-gray-700">
-                      {folder.name}
-                    </span>
-                  </div>
-                </div>
+                  {folder.name}
+                </button>
               </li>
             ))}
           </ul>
+          {/* Delete Folder button */}
+          {selectedFolder && (
+            <div className="mt-4">
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleDeleteFolder}
+              >
+                Delete Folder
+              </button>
+            </div>
+          )}
         </div>
-        {/* Documents Section */}
+
+        {/* Main Area for Documents */}
         <div className="lg:w-3/4 p-4 bg-white shadow-md rounded">
-          <h2 className="text-lg font-semibold mb-4">
-            {selectedFolder ? selectedFolder.name : "All Documents"}
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Documents</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {selectedFolder
-              ? folderDocuments.map((document) => (
-                  <DocumentCard
-                    key={document._id}
-                    document={document}
-                    onTitleClick={() => handleTitleClick(document)}
-                    onDelete={() => handleDeleteDocument(document._id)}
-                  />
-                ))
-              : documents.map((document) => (
-                  <DocumentCard
-                    key={document._id}
-                    document={document}
-                    onTitleClick={() => handleTitleClick(document)}
-                    onDelete={() => handleDeleteDocument(document._id)}
-                  />
-                ))}
+            {(selectedFolder ? folderDocuments : documents).map((document) => (
+              <DocumentCard
+                key={document._id}
+                document={document}
+                onClick={() => handleTitleClick(document)}
+                onDelete={() => handleDeleteDocument(document._id)}
+              />
+            ))}
           </div>
         </div>
       </div>
-      {/* Document Preview Modal */}
       {selectedDocument && (
-        <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
+        <DocumentModal
+          document={selectedDocument}
+          onClose={handleCloseModal}
+          onUpload={handleDocumentUploaded}
+        />
       )}
     </div>
   );
