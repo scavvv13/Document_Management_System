@@ -394,6 +394,35 @@ app.post("/createFolder", async (req, res) => {
   }
 });
 
+app.delete("/folders/:folderId", async (req, res) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  const { folderId } = req.params;
+
+  try {
+    // Find the folder by its ID and delete it
+    const deletedFolder = await Folder.findByIdAndDelete(folderId);
+
+    if (!deletedFolder) {
+      return res.status(404).json({ error: "Folder not found" });
+    }
+
+    // Optionally: you can also remove associated documents inside the folder
+    await Document.deleteMany({ folderId });
+
+    res.json({ message: "Folder deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting folder:", error);
+    res.status(500).json({ error: "Failed to delete folder" });
+  }
+});
+
 app.get("/users/suggestions", async (req, res) => {
   res.header(
     "Access-Control-Allow-Origin",
