@@ -3,7 +3,6 @@ import axios from "axios";
 import DocumentCard from "./DocumentCard";
 import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
-// import FolderModal from "../components/FolderViewModal";
 import LoadingModal from "../components/LoadingModal"; // Import the LoadingModal component
 
 const MyDocuments = () => {
@@ -16,6 +15,7 @@ const MyDocuments = () => {
   const [folders, setFolders] = useState([]);
   const [newFolderName, setNewFolderName] = useState(""); // State for new folder name
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [loadingMessage, setLoadingMessage] = useState(""); // State for dynamic loading message
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -27,32 +27,44 @@ const MyDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
+      setLoadingMessage("Loading documents...");
+      setIsLoading(true);
       const response = await axios.get(`/documents`, {
         params: { userId: user._id },
       });
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchFolders = async () => {
     try {
+      setLoadingMessage("Loading folders...");
+      setIsLoading(true);
       const response = await axios.get(`/folders`, {
         params: { userId: user._id },
       });
       setFolders(response.data);
     } catch (error) {
       console.error("Error fetching folders:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchDocumentsByFolder = async (folderId) => {
     try {
+      setLoadingMessage("Loading folder documents...");
+      setIsLoading(true);
       const response = await axios.get(`/folders/${folderId}/documents`);
       setFolderDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents by folder:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,6 +74,8 @@ const MyDocuments = () => {
 
   const handleDeleteDocument = async (documentId) => {
     try {
+      setLoadingMessage("Deleting document...");
+      setIsLoading(true);
       await axios.delete(`/documents/${documentId}`);
       setDocuments((prevDocuments) =>
         prevDocuments.filter((doc) => doc._id !== documentId)
@@ -71,6 +85,8 @@ const MyDocuments = () => {
       }
     } catch (error) {
       console.error("Error deleting document:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,6 +94,7 @@ const MyDocuments = () => {
     event.preventDefault();
     if (!selectedFile || !user) return;
 
+    setLoadingMessage("Uploading file...");
     setIsLoading(true); // Show loading modal
 
     const formData = new FormData();
@@ -113,6 +130,9 @@ const MyDocuments = () => {
     event.preventDefault();
     if (!newFolderName || !user) return;
 
+    setLoadingMessage("Creating folder...");
+    setIsLoading(true); // Show loading modal
+
     try {
       const response = await axios.post(`/createFolder`, {
         name: newFolderName,
@@ -122,6 +142,8 @@ const MyDocuments = () => {
       setNewFolderName(""); // Clear the folder name input
     } catch (error) {
       console.error("Error creating folder:", error);
+    } finally {
+      setIsLoading(false); // Hide loading modal
     }
   };
 
@@ -158,7 +180,7 @@ const MyDocuments = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
-      <LoadingModal isLoading={isLoading} />{" "}
+      <LoadingModal isLoading={isLoading} message={loadingMessage} />{" "}
       {/* Add the LoadingModal component */}
       {/* Header */}
       <header className="w-full p-4 mb-4 bg-white border border-gray-250 rounded-full shadow-md shadow-gray-400 flex justify-between items-center">
@@ -227,63 +249,48 @@ const MyDocuments = () => {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h10.44a1.5 1.5 0 0 0 1.061-.44l2.12-2.12M21.75 6v12"
+                        d="M3.75 7.5l.914-1.371A1.5 1.5 0 016.01 5.25h3.98a1.5 1.5 0 001.346-.829l.914-1.371A1.5 1.5 0 0113.99 2.25h4.82a1.5 1.5 0 011.497 1.586l-.077 13.628a1.5 1.5 0 01-1.497 1.586H6.01a1.5 1.5 0 01-1.346-.829L3.75 7.5z"
                       />
                     </svg>
-                    <span className="text-lg font-medium">{folder.name}</span>
+                    <span className="font-bold text-gray-700">
+                      {folder.name}
+                    </span>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-        {/* Documents Area */}
-        <div className="lg:w-3/4 p-4">
-          {selectedFolder ? (
-            <>
-              <h2 className="text-lg font-semibold mb-4">
-                Documents in {selectedFolder.name}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {folderDocuments.map((doc) => (
+        {/* Documents Section */}
+        <div className="lg:w-3/4 p-4 bg-white shadow-md rounded">
+          <h2 className="text-lg font-semibold mb-4">
+            {selectedFolder ? selectedFolder.name : "All Documents"}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {selectedFolder
+              ? folderDocuments.map((document) => (
                   <DocumentCard
-                    key={doc._id}
-                    document={doc}
-                    onClick={() => handleTitleClick(doc)}
-                    onDelete={() => handleDeleteDocument(doc._id)}
+                    key={document._id}
+                    document={document}
+                    onTitleClick={() => handleTitleClick(document)}
+                    onDelete={() => handleDeleteDocument(document._id)}
+                  />
+                ))
+              : documents.map((document) => (
+                  <DocumentCard
+                    key={document._id}
+                    document={document}
+                    onTitleClick={() => handleTitleClick(document)}
+                    onDelete={() => handleDeleteDocument(document._id)}
                   />
                 ))}
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="text-lg font-semibold mb-4">All Documents</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {documents.map((doc) => (
-                  <DocumentCard
-                    key={doc._id}
-                    document={doc}
-                    onTitleClick={() => handleTitleClick(doc)}
-                    onDelete={() => handleDeleteDocument(doc._id)}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          </div>
         </div>
       </div>
-      {/* Document Modal */}
+      {/* Document Preview Modal */}
       {selectedDocument && (
         <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
       )}
-      {/* Folder Modal */}
-      {/* {selectedFolder && (
-        // <FolderModal
-        //   folder={selectedFolder}
-        //   onClose={handleCloseFolderModal}
-        //   onDocumentUploaded={handleDocumentUploaded}
-        // />
-      )} */}
     </div>
   );
 };
