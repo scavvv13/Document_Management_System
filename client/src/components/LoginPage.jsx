@@ -2,21 +2,23 @@ import { useContext, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../UserContext.jsx";
+import LoadingModal from "./LoadingModal"; // Import the LoadingModal component
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State to toggle show/hide password
+  const [isLoading, setIsLoading] = useState(false); // State for managing loading
   const { setUser } = useContext(UserContext);
 
   // Function to handle form submission
   async function loginUser(event) {
     event.preventDefault();
+    setIsLoading(true); // Start loading
     try {
       const { data } = await axios.post(`/LoginPage`, {
         withCredentials: true,
-
         email,
         password,
       });
@@ -25,6 +27,8 @@ function LoginPage() {
       setRedirect(true);
     } catch (error) {
       alert("Login failed");
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   }
 
@@ -39,6 +43,11 @@ function LoginPage() {
 
   return (
     <div className="mt-20 grow flex items-center justify-around">
+      <LoadingModal
+        isLoading={isLoading}
+        message="Logging in, please wait..."
+      />{" "}
+      {/* Loading Modal */}
       <div className="mb-60">
         <h1 className="text-4xl text-center mb-10">Login</h1>
         <form className="max-w-md mx-auto" onSubmit={loginUser}>
