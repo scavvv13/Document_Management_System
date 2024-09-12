@@ -15,9 +15,12 @@ const MemosPage = () => {
   useEffect(() => {
     const fetchMemos = async () => {
       try {
-        const response = await axios.get(`/memos`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `https://document-management-system-1-0b91.onrender.com/memos`,
+          {
+            withCredentials: true,
+          }
+        );
         const today = new Date();
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
@@ -77,11 +80,14 @@ const MemosPage = () => {
       }
 
       if (isEditing) {
-        const response = await axios.put(`/memos/${currentMemoId}`, {
-          withCredentials: true,
-          title,
-          content,
-        });
+        const response = await axios.put(
+          `https://document-management-system-1-0b91.onrender.com/memos/${currentMemoId}`,
+          {
+            withCredentials: true,
+            title,
+            content,
+          }
+        );
         setMemos((prevMemos) =>
           prevMemos.map((memoGroup) => ({
             ...memoGroup,
@@ -91,11 +97,14 @@ const MemosPage = () => {
           }))
         );
       } else {
-        const response = await axios.post(`/memos`, {
-          withCredentials: true,
-          title,
-          content,
-        });
+        const response = await axios.post(
+          `https://document-management-system-1-0b91.onrender.com/memos`,
+          {
+            withCredentials: true,
+            title,
+            content,
+          }
+        );
         setMemos((prevMemos) => [
           {
             title: "Today",
@@ -126,9 +135,12 @@ const MemosPage = () => {
         return;
       }
 
-      await axios.delete(`/memos/${id}`, {
-        withCredentials: true,
-      });
+      await axios.delete(
+        `https://document-management-system-1-0b91.onrender.com/memos/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
       setMemos((prevMemos) =>
         prevMemos.map((memoGroup) => ({
           ...memoGroup,

@@ -126,12 +126,16 @@ const MyDocuments = () => {
     }
 
     try {
-      await axios.post(`/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
+      await axios.post(
+        `https://document-management-system-1-0b91.onrender.com/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
       setSelectedFile(null);
       fileInputRef.current.value = "";
 
@@ -155,10 +159,13 @@ const MyDocuments = () => {
     setIsLoading(true); // Show loading modal
 
     try {
-      const response = await axios.post(`/createFolder`, {
-        name: newFolderName,
-        userId: user._id, // Include userId in the request body
-      });
+      const response = await axios.post(
+        `https://document-management-system-1-0b91.onrender.com/createFolder`,
+        {
+          name: newFolderName,
+          userId: user._id, // Include userId in the request body
+        }
+      );
       setFolders((prevFolders) => [...prevFolders, response.data]);
       setNewFolderName(""); // Clear the folder name input
     } catch (error) {

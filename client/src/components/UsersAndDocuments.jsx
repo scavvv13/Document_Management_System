@@ -10,11 +10,14 @@ const UsersAndDocuments = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDocumentsModalOpen, setUserDocumentsModalOpen] = useState(false);
   const [modalUser, setModalUser] = useState(null);
+  const adminToken = "your-admin-token"; // Replace with your actual admin token
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`/users`);
+        const response = await axios.get(
+          `https://document-management-system-1-0b91.onrender.com/users`
+        );
         if (response.status === 200) {
           setUsers(response.data);
         } else {
@@ -79,11 +82,15 @@ const UsersAndDocuments = () => {
 
   const handleMakeAdmin = async (user) => {
     try {
-      await axios.patch(`/users/${user._id}/make-admin`, null, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
+      await axios.patch(
+        `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
       toast.success(`${user.name} is now an admin.`);
       setUsers((prevUsers) =>
         prevUsers.map((u) => (u._id === user._id ? { ...u, isAdmin: true } : u))
@@ -96,11 +103,15 @@ const UsersAndDocuments = () => {
 
   const handleRevokeAdmin = async (user) => {
     try {
-      await axios.patch(`/users/${user._id}/revoke-admin`, null, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
+      await axios.patch(
+        `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
       toast.success(`${user.name} is no longer an admin.`);
       setUsers((prevUsers) =>
         prevUsers.map((u) =>
@@ -115,11 +126,14 @@ const UsersAndDocuments = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
+      await axios.delete(
+        `https://document-management-system-1-0b91.onrender.com/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
       toast.success("User deleted successfully.");
     } catch (error) {
