@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 
 function RegisterPage() {
@@ -27,6 +27,7 @@ function RegisterPage() {
     try {
       await axios.post("/RegisterPage", { name, email, password });
       alert("Registration successful. You can now log in.");
+      Navigate("/LoginPage");
     } catch (error) {
       console.error(error);
       alert("Registration failed. Please try again later.");
