@@ -10,6 +10,8 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
   useEffect(() => {
     if (isOpen && user) {
       fetchUserDocuments(user._id);
+    } else {
+      setUserDocuments([]); // Clear documents when modal is closed
     }
   }, [isOpen, user]);
 
@@ -29,9 +31,7 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
 
   const handleDeleteDocument = async (userId, documentId) => {
     try {
-      await axios.delete(
-        `https://document-management-system-ls7j.onrender.com/documents/${documentId}`
-      );
+      await axios.delete(`/documents/${documentId}`);
       fetchUserDocuments(userId); // Refresh the document list
       toast.success("Document deleted successfully.");
     } catch (error) {
@@ -71,7 +71,7 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
         </div>
         <div className="overflow-y-auto max-h-96">
           {loading ? (
-            <p>Loading documents...</p>
+            <p className="text-center">Loading documents...</p>
           ) : userDocuments.length > 0 ? (
             userDocuments.map((doc) => (
               <DocumentCard
@@ -81,7 +81,7 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
               />
             ))
           ) : (
-            <p>No documents found for {user?.name}.</p>
+            <p className="text-center">No documents found for {user?.name}.</p>
           )}
         </div>
       </div>
