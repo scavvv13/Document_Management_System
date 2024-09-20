@@ -11,17 +11,22 @@ export function UserContextProvider({ children }) {
     const fetchUser = async () => {
       try {
         const { data } = await axios.get("/profile", { withCredentials: true });
-        // Handle the case where the server returns null or an error
-        if (data && data.error) {
-          setUser(null); // or handle specific error cases
+
+        // Check if data is null or if there's an error message in the response
+        if (
+          !data ||
+          data.message === "Invalid or expired token" ||
+          data.message === "No token provided"
+        ) {
+          setUser(null); // Log the user out or clear the user state
         } else {
-          setUser(data);
+          setUser(data); // Set the user if data is valid
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
-        setUser(null); // handle network errors
+        setUser(null); // Set user to null if there's a network or server error
       } finally {
-        setReady(true); // Set ready to true after attempting to fetch user
+        setReady(true); // Indicate that the fetch attempt is complete
       }
     };
 
