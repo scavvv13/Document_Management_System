@@ -919,6 +919,11 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
 
+  // Allow OPTIONS request for preflight
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
   const { documentId } = req.params;
   const { email } = req.body;
 
@@ -949,9 +954,17 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
     }
 
     // Update the document to add user to sharedWith list
-    await Document.findByIdAndUpdate(documentId, {
-      $addToSet: { sharedWith: user._id },
-    });
+    const updatedDocument = await Document.findByIdAndUpdate(
+      documentId,
+      {
+        $addToSet: { sharedWith: user._id }, // Avoid duplicate entries
+      },
+      { new: true }
+    );
+
+    if (!updatedDocument) {
+      return res.status(500).json({ message: "Failed to update document." });
+    }
 
     // Create a notification for the user
     await createNotification(
@@ -959,10 +972,10 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
       `A document has been shared with you: ${document.originalname}`
     );
 
-    res.status(200).json({ message: `Document shared with ${email}` });
+    return res.status(200).json({ message: `Document shared with ${email}` });
   } catch (error) {
     console.error("Error sharing document:", error);
-    res.status(500).json({ message: "Error sharing document" });
+    return res.status(500).json({ message: "Error sharing document" });
   }
 });
 

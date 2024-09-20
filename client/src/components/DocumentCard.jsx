@@ -1,6 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
+// Create a reusable axios instance
+const api = axios.create({
+  baseURL: "https://document-management-system-1-0b91.onrender.com",
+});
+
 const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   const downloadLinkRef = useRef(null);
   const [shareableLink, setShareableLink] = useState(null);
@@ -12,9 +17,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
   useEffect(() => {
     const fetchSignedUrl = async () => {
       try {
-        const response = await axios.get(
-          `https://document-management-system-1-0b91.onrender.com/documents/${document._id}/signed-url`
-        );
+        const response = await api.get(`/documents/${document._id}/signed-url`);
         setSignedImageUrl(response.data.signedUrl);
       } catch (error) {
         console.error("Error fetching signed URL:", error);
@@ -24,9 +27,9 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
     if (document.previewImageUrl) {
       fetchSignedUrl();
     }
-  }, [document.previewImageUrl]);
+  }, [document.previewImageUrl, document._id]);
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this document?")) {
       onDelete();
     }
@@ -34,12 +37,9 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleDownload = async (documentId, originalname, contentType) => {
     try {
-      const response = await axios.get(
-        `https://document-management-system-1-0b91.onrender.com/documents/${documentId}/content`,
-        {
-          responseType: "blob",
-        }
-      );
+      const response = await api.get(`/documents/${documentId}/content`, {
+        responseType: "blob",
+      });
 
       const url = window.URL.createObjectURL(
         new Blob([response.data], { type: contentType })
@@ -56,10 +56,9 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
 
   const handleShare = async (documentId, email) => {
     try {
-      const response = await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/documents/${documentId}/share`,
-        { email }
-      );
+      const response = await api.post(`/documents/${documentId}/share`, {
+        email,
+      });
       setShareableLink(response.data.message);
     } catch (error) {
       console.error("Error sharing document:", error);
@@ -102,6 +101,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
       <h3
         className="text-md font-semibold mb-1 overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
         onClick={() => onTitleClick(document)}
+        aria-label={`Open document: ${document.originalname}`}
       >
         {document.originalname}
       </h3>
@@ -116,6 +116,7 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
         <button
           className="btn-delete text-white bg-red-500 hover:bg-red-600 px-2 py-1 text-xs rounded-md focus:outline-none"
           onClick={handleDelete}
+          aria-label="Delete document"
         >
           Delete
         </button>
@@ -128,12 +129,14 @@ const DocumentCard = ({ document, onDelete, onTitleClick }) => {
               document.contentType
             )
           }
+          aria-label="Download document"
         >
           Download
         </button>
         <button
           className="btn-share text-white bg-green-500 hover:bg-green-600 px-2 py-1 text-xs rounded-md focus:outline-none"
           onClick={openSharePopup}
+          aria-label="Share document"
         >
           Share
         </button>
