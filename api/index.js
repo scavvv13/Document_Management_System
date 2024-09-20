@@ -157,16 +157,30 @@ app.get("/profile", (req, res) => {
     "Access-Control-Allow-Methods",
     "PUT, POST, GET, DELETE, PATCH, OPTIONS"
   );
+
   const { token } = req.cookies;
+
   if (token) {
-    verifyJWT;
-    jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
-      if (err) throw err;
-      const { name, email, _id, isAdmin } = await User.findById(userData.id);
-      res.json({ name, email, _id, isAdmin });
+    // Verify JWT token
+    jwt.verify(token, process.env.JWT_SECRET, async (err, userData) => {
+      if (err) {
+        // Handle token verification errors (e.g., token expired, invalid)
+        return res.status(401).json({ message: "Invalid or expired token" });
+      }
+
+      try {
+        // Find the user in the database using the decoded token's user id
+        const { name, email, _id, isAdmin } = await User.findById(userData.id);
+        res.json({ name, email, _id, isAdmin });
+      } catch (dbError) {
+        // Handle database errors
+        console.error(dbError);
+        res.status(500).json({ message: "Internal server error" });
+      }
     });
   } else {
-    res.json(null);
+    // If no token is provided, respond with unauthorized
+    res.status(401).json({ message: "No token provided" });
   }
 });
 
