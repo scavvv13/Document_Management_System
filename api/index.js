@@ -178,7 +178,16 @@ app.post("/logout", (req, res) => {
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
-  res.cookie("token", "").json(true);
+
+  // Clear the cookie by setting it to an empty string and expiring it immediately
+  res
+    .cookie("token", "", {
+      httpOnly: true,
+      secure: true, // Ensure this matches the setting when the cookie was set
+      sameSite: "None", // SameSite must match the setting when the cookie was set
+      expires: new Date(0), // Immediately expire the cookie
+    })
+    .json({ message: "Logged out successfully" });
 });
 
 const upload = multer({ storage: multer.memoryStorage() });
