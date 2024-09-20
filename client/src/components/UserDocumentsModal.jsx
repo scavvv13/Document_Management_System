@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DocumentCard from "./DocumentCard";
+import { toast } from "react-toastify";
 
 const UserDocumentsModal = ({ isOpen, onClose, user }) => {
   const [userDocuments, setUserDocuments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -12,25 +14,29 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
   }, [isOpen, user]);
 
   const fetchUserDocuments = async (userId) => {
+    setLoading(true);
     try {
       const response = await axios.get(`/documents?userId=${userId}`);
       setUserDocuments(response.data);
     } catch (error) {
       console.error("Error fetching user documents:", error);
       setUserDocuments([]);
+      toast.error("Failed to fetch user documents.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteDocument = async (userId, documentId) => {
-    // Implement your delete logic here, e.g., calling an API endpoint
     try {
       await axios.delete(
         `https://document-management-system-ls7j.onrender.com/documents/${documentId}`
       );
-      // Assuming you want to refresh the document list after deletion
-      fetchUserDocuments(userId);
+      fetchUserDocuments(userId); // Refresh the document list
+      toast.success("Document deleted successfully.");
     } catch (error) {
       console.error("Error deleting document:", error);
+      toast.error("Failed to delete document.");
     }
   };
 
@@ -64,7 +70,9 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
           </button>
         </div>
         <div className="overflow-y-auto max-h-96">
-          {userDocuments.length > 0 ? (
+          {loading ? (
+            <p>Loading documents...</p>
+          ) : userDocuments.length > 0 ? (
             userDocuments.map((doc) => (
               <DocumentCard
                 key={doc._id}

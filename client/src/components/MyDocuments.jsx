@@ -3,20 +3,20 @@ import axios from "axios";
 import DocumentCard from "./DocumentCard";
 import DocumentModal from "./DocumentPreviewModal";
 import { UserContext } from "../UserContext";
-import FolderModal from "../components/FolderViewModal";
-import LoadingModal from "../components/LoadingModal"; // Import the LoadingModal component
+import LoadingModal from "../components/LoadingModal";
 
 const MyDocuments = () => {
   const { user } = useContext(UserContext);
   const [documents, setDocuments] = useState([]);
-  const [folderDocuments, setFolderDocuments] = useState([]); // State for folder documents
+  const [folderDocuments, setFolderDocuments] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const [selectedFolder, setSelectedFolder] = useState(null); // State for selected folder
+  const [selectedFolder, setSelectedFolder] = useState(null);
   const [folders, setFolders] = useState([]);
-  const [newFolderName, setNewFolderName] = useState(""); // State for new folder name
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
-  const [loadingMessage, setLoadingMessage] = useState(""); // State for dynamic loading message
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -26,47 +26,30 @@ const MyDocuments = () => {
     }
   }, [user]);
 
-  const fetchDocuments = async () => {
+  const fetchData = async (url, params, setData) => {
     try {
-      setLoadingMessage("Loading documents...");
+      setLoadingMessage(`Loading...`);
       setIsLoading(true);
-      const response = await axios.get(`/documents`, {
-        params: { userId: user._id },
-      });
-      setDocuments(response.data);
+      const response = await axios.get(url, { params });
+      setData(response.data);
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      console.error("Error fetching data:", error);
+      setErrorMessage("Could not load data. Please try again later."); // Set error message
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchFolders = async () => {
-    try {
-      setLoadingMessage("Loading folders...");
-      setIsLoading(true);
-      const response = await axios.get(`/folders`, {
-        params: { userId: user._id },
-      });
-      setFolders(response.data);
-    } catch (error) {
-      console.error("Error fetching folders:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchDocuments = () => {
+    fetchData(`/documents`, { userId: user._id }, setDocuments);
   };
 
-  const fetchDocumentsByFolder = async (folderId) => {
-    try {
-      setLoadingMessage("Loading folder documents...");
-      setIsLoading(true);
-      const response = await axios.get(`/folders/${folderId}/documents`);
-      setFolderDocuments(response.data);
-    } catch (error) {
-      console.error("Error fetching documents by folder:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchFolders = () => {
+    fetchData(`/folders`, { userId: user._id }, setFolders);
+  };
+
+  const fetchDocumentsByFolder = (folderId) => {
+    fetchData(`/folders/${folderId}/documents`, {}, setFolderDocuments);
   };
 
   const handleFileChange = (event) => {
@@ -74,38 +57,33 @@ const MyDocuments = () => {
   };
 
   const handleDeleteDocument = async (documentId) => {
-    try {
-      setLoadingMessage("Deleting document...");
-      setIsLoading(true);
-      await axios.delete(`/documents/${documentId}`);
-      setDocuments((prevDocuments) =>
-        prevDocuments.filter((doc) => doc._id !== documentId)
-      );
-      if (selectedFolder) {
-        fetchDocumentsByFolder(selectedFolder._id); // Refresh folder documents if inside a folder
-      }
-    } catch (error) {
-      console.error("Error deleting document:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    if (!window.confirm("Are you sure you want to delete this document?"))
+      return;
+    await deleteEntity(`/documents/${documentId}`, setDocuments, "document");
   };
 
   const handleDeleteFolder = async () => {
-    if (!selectedFolder) return;
+    if (
+      !selectedFolder ||
+      !window.confirm("Are you sure you want to delete this folder?")
+    )
+      return;
+    await deleteEntity(`/folders/${selectedFolder._id}`, setFolders, "folder");
+    setSelectedFolder(null);
+    setFolderDocuments([]);
+  };
 
+  const deleteEntity = async (url, setData, entity) => {
     try {
-      setLoadingMessage("Deleting folder...");
+      setLoadingMessage(`Deleting ${entity}...`);
       setIsLoading(true);
-      await axios.delete(`/folders/${selectedFolder._id}`);
-      setFolders((prevFolders) =>
-        prevFolders.filter((folder) => folder._id !== selectedFolder._id)
+      await axios.delete(url);
+      setData((prev) =>
+        prev.filter((item) => item._id !== url.split("/").pop())
       );
-      setSelectedFolder(null); // Reset selected folder
-      setFolderDocuments([]); // Clear folder documents
-      fetchDocuments(); // Refresh all documents
     } catch (error) {
-      console.error("Error deleting folder:", error);
+      console.error(`Error deleting ${entity}:`, error);
+      setErrorMessage(`Could not delete ${entity}. Please try again.`);
     } finally {
       setIsLoading(false);
     }
@@ -116,38 +94,31 @@ const MyDocuments = () => {
     if (!selectedFile || !user) return;
 
     setLoadingMessage("Uploading file...");
-    setIsLoading(true); // Show loading modal
+    setIsLoading(true);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("userId", user._id);
     if (selectedFolder) {
-      formData.append("folderId", selectedFolder._id); // Append folderId if a folder is selected
+      formData.append("folderId", selectedFolder._id);
     }
 
     try {
-      await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      await axios.post(`/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
       setSelectedFile(null);
       fileInputRef.current.value = "";
-
+      fetchDocuments(); // Refresh documents
       if (selectedFolder) {
-        fetchDocumentsByFolder(selectedFolder._id); // Refresh folder documents if inside a folder
-      } else {
-        fetchDocuments(); // Refresh all documents
+        fetchDocumentsByFolder(selectedFolder._id);
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+      setErrorMessage("Could not upload file. Please try again.");
     } finally {
-      setIsLoading(false); // Hide loading modal
+      setIsLoading(false);
     }
   };
 
@@ -156,22 +127,20 @@ const MyDocuments = () => {
     if (!newFolderName || !user) return;
 
     setLoadingMessage("Creating folder...");
-    setIsLoading(true); // Show loading modal
+    setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `https://document-management-system-1-0b91.onrender.com/createFolder`,
-        {
-          name: newFolderName,
-          userId: user._id, // Include userId in the request body
-        }
-      );
-      setFolders((prevFolders) => [...prevFolders, response.data]);
-      setNewFolderName(""); // Clear the folder name input
+      const response = await axios.post(`/createFolder`, {
+        name: newFolderName,
+        userId: user._id,
+      });
+      setFolders((prev) => [...prev, response.data]);
+      setNewFolderName("");
     } catch (error) {
       console.error("Error creating folder:", error);
+      setErrorMessage("Could not create folder. Please try again.");
     } finally {
-      setIsLoading(false); // Hide loading modal
+      setIsLoading(false);
     }
   };
 
@@ -185,21 +154,7 @@ const MyDocuments = () => {
 
   const handleFolderClick = (folder) => {
     setSelectedFolder(folder);
-    fetchDocumentsByFolder(folder._id); // Fetch documents within the selected folder
-  };
-
-  const handleCloseFolderModal = () => {
-    setSelectedFolder(null);
-    setFolderDocuments([]); // Clear folder documents when the modal is closed
-    fetchDocuments(); // Refresh all documents when the folder modal is closed
-  };
-
-  const handleDocumentUploaded = () => {
-    if (selectedFolder) {
-      fetchDocumentsByFolder(selectedFolder._id);
-    } else {
-      fetchDocuments();
-    }
+    fetchDocumentsByFolder(folder._id);
   };
 
   if (!user) {
@@ -208,9 +163,9 @@ const MyDocuments = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6 lg:p-8">
-      <LoadingModal isLoading={isLoading} message={loadingMessage} />{" "}
-      {/* Add the LoadingModal component */}
-      {/* Header */}
+      <LoadingModal isLoading={isLoading} message={loadingMessage} />
+      {errorMessage && <div className="text-red-500">{errorMessage}</div>}{" "}
+      {/* Display error message */}
       <header className="w-full p-4 mb-4 bg-white border border-gray-250 rounded-full shadow-md shadow-gray-400 flex justify-between items-center">
         <h1 className="text-xl font-bold pl-6">My Documents</h1>
         <div className="flex items-center gap-2">
@@ -246,16 +201,14 @@ const MyDocuments = () => {
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
               onClick={handleFileUpload}
-              disabled={!fileInputRef.current?.files?.[0]}
+              disabled={!selectedFile}
             >
               Upload
             </button>
           </div>
         </div>
       </header>
-      {/* Main Content Area */}
       <div className="flex flex-col lg:flex-row lg:space-x-4">
-        {/* Sidebar for Folders */}
         <div className="lg:w-1/4 p-4 bg-white shadow-md rounded mb-4 lg:mb-0">
           <h2 className="text-lg font-semibold mb-4">Folders</h2>
           <ul className="list-none space-y-4">
@@ -274,7 +227,6 @@ const MyDocuments = () => {
               </li>
             ))}
           </ul>
-          {/* Delete Folder button */}
           {selectedFolder && (
             <div className="mt-4">
               <button
@@ -287,7 +239,6 @@ const MyDocuments = () => {
           )}
         </div>
 
-        {/* Main Area for Documents */}
         <div className="lg:w-3/4 p-4 bg-white shadow-md rounded">
           <h2 className="text-lg font-semibold mb-4">Documents</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -305,14 +256,6 @@ const MyDocuments = () => {
       {selectedDocument && (
         <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
       )}
-      {/* Folder Modal */}
-      {/* {selectedFolder && (
-        // <FolderModal
-        //   folder={selectedFolder}
-        //   onClose={handleCloseFolderModal}
-        //   onDocumentUploaded={handleDocumentUploaded}
-        // />
-      )} */}
     </div>
   );
 };

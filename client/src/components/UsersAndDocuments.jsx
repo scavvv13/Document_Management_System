@@ -10,13 +10,15 @@ const UsersAndDocuments = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDocumentsModalOpen, setUserDocumentsModalOpen] = useState(false);
   const [modalUser, setModalUser] = useState(null);
-  const adminToken = "your-admin-token"; // Replace with your actual admin token
+  const [loading, setLoading] = useState(false);
+  const adminToken = process.env.REACT_APP_ADMIN_TOKEN; // Use an environment variable
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
-          `https://document-management-system-1-0b91.onrender.com/users`
+          "https://document-management-system-1-0b91.onrender.com/users"
         );
         if (response.status === 200) {
           setUsers(response.data);
@@ -26,6 +28,8 @@ const UsersAndDocuments = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
         toast.error("Failed to fetch users.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -81,6 +85,7 @@ const UsersAndDocuments = () => {
   };
 
   const handleMakeAdmin = async (user) => {
+    setLoading(true);
     try {
       await axios.patch(
         `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`,
@@ -98,10 +103,13 @@ const UsersAndDocuments = () => {
     } catch (error) {
       console.error("Error making user admin:", error);
       toast.error("Failed to make user an admin.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRevokeAdmin = async (user) => {
+    setLoading(true);
     try {
       await axios.patch(
         `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`,
@@ -121,10 +129,14 @@ const UsersAndDocuments = () => {
     } catch (error) {
       console.error("Error revoking admin status:", error);
       toast.error("Failed to revoke admin status.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return; // Confirmation dialog
+    setLoading(true);
     try {
       await axios.delete(
         `https://document-management-system-1-0b91.onrender.com/users/${userId}`,
@@ -139,6 +151,8 @@ const UsersAndDocuments = () => {
     } catch (error) {
       console.error("Error deleting user:", error);
       toast.error("Failed to delete user.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,12 +161,19 @@ const UsersAndDocuments = () => {
       <h1 className="text-2xl font-bold mb-5">Users and Documents</h1>
       <div className="flex justify-center">
         <div className="w-full">
-          <Table columns={columns} data={users} />
+          {loading ? (
+            <div className="text-center">Loading...</div>
+          ) : (
+            <Table columns={columns} data={users} />
+          )}
         </div>
       </div>
       <UserDocumentsModal
         isOpen={userDocumentsModalOpen}
-        onClose={() => setUserDocumentsModalOpen(false)}
+        onClose={() => {
+          setUserDocumentsModalOpen(false);
+          setModalUser(null); // Clear modal state on close
+        }}
         user={modalUser}
       />
       <ToastContainer position="top-right" />

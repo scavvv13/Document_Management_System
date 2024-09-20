@@ -14,27 +14,31 @@ const AccountPage = () => {
     subpage = "profile";
   }
 
-  async function logout() {
-    await axios.post("/logout");
-    setRedirect("/");
-    setUser(null);
-  }
+  const logout = async () => {
+    try {
+      await axios.post("/logout", {}, { withCredentials: true });
+      setUser(null); // Clear user state after logout
+      setRedirect("/"); // Set redirect after successful logout
+    } catch (error) {
+      console.error("Logout error:", error); // Handle logout error
+    }
+  };
 
   if (!ready) {
     return "Loading...";
   }
 
-  if (ready && !user && !redirect) {
+  if (!user && !redirect) {
     return <Navigate to={"/LoginPage"} />;
   }
 
-  function linkClasses(type = null) {
-    let classes = " p-2 px-6";
+  const linkClasses = (type = null) => {
+    let classes = "p-2 px-6";
     if (type === subpage) {
-      classes += " bg-red-500 text-white rounded-full ";
+      classes += " bg-red-500 text-white rounded-full";
     }
     return classes;
-  }
+  };
 
   if (redirect) {
     return <Navigate to={redirect} />;
@@ -42,7 +46,19 @@ const AccountPage = () => {
 
   return (
     <div>
-      <nav className="w-full  gap-2 mb-15 justify-center flex"></nav>
+      <nav className="w-full gap-2 mb-15 justify-center flex">
+        {/* Optional: Add navigation links using linkClasses */}
+        <Link to="/account/profile" className={linkClasses("profile")}>
+          Profile
+        </Link>
+        <Link to="/account/documents" className={linkClasses("documents")}>
+          My Documents
+        </Link>
+        <Link to="/account/users" className={linkClasses("users")}>
+          Users
+        </Link>
+      </nav>
+
       {subpage === "profile" && (
         <div className="text-center max-w-lg mx-auto mt-10">
           Logged in as {user.name} ({user.email}) <br />
@@ -52,8 +68,15 @@ const AccountPage = () => {
         </div>
       )}
       {subpage === "documents" && <MyDocuments />}
-      {subpage === "users" && <UsersAndDocuments />}{" "}
-      {/* Render UsersAndDocuments component */}
+      {subpage === "users" && <UsersAndDocuments />}
+      {/* Optional: Handle invalid subpage */}
+      {subpage !== "profile" &&
+        subpage !== "documents" &&
+        subpage !== "users" && (
+          <div className="text-center max-w-lg mx-auto mt-10">
+            <p>Invalid subpage. Please select a valid option.</p>
+          </div>
+        )}
     </div>
   );
 };
