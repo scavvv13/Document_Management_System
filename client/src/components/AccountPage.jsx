@@ -46,19 +46,6 @@ const AccountPage = () => {
 
   return (
     <div>
-      <nav className="w-full gap-2 mb-15 justify-center flex">
-        {/* Optional: Add navigation links using linkClasses */}
-        <Link to="/account/profile" className={linkClasses("profile")}>
-          Profile
-        </Link>
-        <Link to="/account/documents" className={linkClasses("documents")}>
-          My Documents
-        </Link>
-        <Link to="/account/users" className={linkClasses("users")}>
-          Users
-        </Link>
-      </nav>
-
       {subpage === "profile" && (
         <div className="text-center max-w-lg mx-auto mt-10">
           Logged in as {user.name} ({user.email}) <br />
