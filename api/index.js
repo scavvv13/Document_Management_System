@@ -105,6 +105,7 @@ app.post("/LoginPage", async (req, res) => {
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
+
   const { email, password } = req.body;
   const LoggedInUser = await User.findOne({ email });
 
@@ -122,11 +123,18 @@ app.post("/LoginPage", async (req, res) => {
         {},
         (err, token) => {
           if (err) {
-            console.error(err); // Log any JWT signing errors
+            console.error(err);
             res.status(500).json({ message: "Internal server error" });
             return;
           }
-          res.cookie("token", token).json(LoggedInUser);
+          // Set the cookie with SameSite=None and Secure attributes
+          res
+            .cookie("token", token, {
+              httpOnly: true,
+              secure: true,
+              sameSite: "None",
+            })
+            .json(LoggedInUser);
         }
       );
     } else {
