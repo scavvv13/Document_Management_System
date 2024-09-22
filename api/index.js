@@ -487,7 +487,7 @@ app.get("/users", async (req, res) => {
         $lookup: {
           from: "documents",
           localField: "_id",
-          foreignField: "user", // Make sure this matches the field in the documents collection
+          foreignField: "User", // Make sure this matches the field in the documents collection
           as: "documents",
         },
       },
