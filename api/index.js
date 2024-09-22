@@ -62,6 +62,19 @@ app.use(cors(corsOptions));
 
 // Ensure preflight requests are handled
 app.options("*", cors(corsOptions));
+
+const setHeaders = (req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://document-management-system-liard.vercel.app"
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+};
+
+app.use(setHeaders); // Apply the headers globally
 //nice
 
 // Connect to MongoDB
@@ -601,13 +614,6 @@ app.delete("/documents/:documentId", async (req, res) => {
 
 // DELETE user and their documents
 app.delete("/users/:userId", async (req, res) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.params;
 
   try {
@@ -636,13 +642,6 @@ app.delete("/users/:userId", async (req, res) => {
 });
 
 app.patch("/users/:id/make-admin", async (req, res) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -650,8 +649,12 @@ app.patch("/users/:id/make-admin", async (req, res) => {
       { new: true }
     );
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     // Create notification for the user
-    await createNotification(user._id, `You have been granted admin rights.`);
+    await createNotification(user._id, "You have been granted admin rights.");
 
     res.status(200).json(user);
   } catch (error) {
@@ -661,13 +664,6 @@ app.patch("/users/:id/make-admin", async (req, res) => {
 
 // Revoke admin rights
 app.patch("/users/:id/revoke-admin", async (req, res) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -675,28 +671,26 @@ app.patch("/users/:id/revoke-admin", async (req, res) => {
       { new: true }
     );
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     // Create notification for the user
-    await createNotification(user._id, `Your admin rights have been revoked.`);
+    await createNotification(user._id, "Your admin rights have been revoked.");
 
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 app.put("/users/:userId", async (req, res) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
   const { userId } = req.params;
   const { isAdmin } = req.body;
 
   try {
     // Find user by ID and update isAdmin field
-    const updatedUser = await UserModel.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       { isAdmin },
       { new: true } // Return the updated document
