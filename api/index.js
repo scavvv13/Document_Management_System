@@ -481,28 +481,24 @@ app.get("/documents/suggestions", async (req, res) => {
 });
 // Fetch all users with their documents
 app.get("/users", async (req, res) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
   try {
     const usersWithDocuments = await User.aggregate([
       {
         $lookup: {
           from: "documents",
           localField: "_id",
-          foreignField: "userId",
+          foreignField: "user", // Make sure this matches the field in the documents collection
           as: "documents",
         },
       },
     ]);
+
     res.status(200).json(usersWithDocuments);
   } catch (err) {
     console.error("Error fetching users with documents:", err);
-    res.status(500).send(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
   }
 });
 
