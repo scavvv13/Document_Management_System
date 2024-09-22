@@ -901,19 +901,6 @@ app.delete("/notifications/:id", async (req, res) => {
 // Add this route to your existing routes
 
 app.post("/api/documents/:documentId/share", async (req, res) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://document-management-system-liard.vercel.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  // Allow OPTIONS request for preflight
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
   const { documentId } = req.params;
   const { email } = req.body;
 
@@ -923,10 +910,10 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    // Find the user and document concurrently
+    // Find the user by email and the document by documentId concurrently
     const [user, document] = await Promise.all([
-      User.findOne({ email }).lean(),
-      Document.findById(documentId).lean(),
+      UserModel.findOne({ email }),
+      Document.findById(documentId),
     ]);
 
     if (!user) {
@@ -936,25 +923,16 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    // Check if user is already in the sharedWith list
+    // Check if the user is already in the sharedWith list
     if (document.sharedWith.includes(user._id)) {
       return res
         .status(200)
         .json({ message: "Document already shared with this user" });
     }
 
-    // Update the document to add user to sharedWith list
-    const updatedDocument = await Document.findByIdAndUpdate(
-      documentId,
-      {
-        $addToSet: { sharedWith: user._id }, // Avoid duplicate entries
-      },
-      { new: true }
-    );
-
-    if (!updatedDocument) {
-      return res.status(500).json({ message: "Failed to update document." });
-    }
+    // Add the user to the sharedWith array using $addToSet to avoid duplicates
+    document.sharedWith.push(user._id);
+    await document.save();
 
     // Create a notification for the user
     await createNotification(
@@ -962,7 +940,9 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
       `A document has been shared with you: ${document.originalname}`
     );
 
-    return res.status(200).json({ message: `Document shared with ${email}` });
+    return res
+      .status(200)
+      .json({ message: `Document shared with ${email} successfully` });
   } catch (error) {
     console.error("Error sharing document:", error);
     return res.status(500).json({ message: "Error sharing document" });
