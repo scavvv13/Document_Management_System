@@ -1,24 +1,25 @@
-import React, { useState, useEffect, useCallback, useMemo, useContext } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import Table from "./Table";
 import UserDocumentsModal from "./UserDocumentsModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { UserContext } from "../context/UserContext"; // Assuming UserContext is set up
 
+// Utility function to handle API errors
 const handleApiError = (error, message) => {
   console.error(message, error);
   toast.error(message);
 };
 
 const UsersAndDocuments = () => {
-  const { user: loggedInUser } = useContext(UserContext); // Get the logged-in user's info, including isAdmin
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDocumentsModalOpen, setUserDocumentsModalOpen] = useState(false);
   const [modalUser, setModalUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const adminToken = process.env.REACT_APP_ADMIN_TOKEN;
 
+  // Fetch users on component mount
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -41,6 +42,7 @@ const UsersAndDocuments = () => {
     fetchUsers();
   }, []);
 
+  // Memoize columns to prevent redefinition on every render
   const columns = useMemo(
       () => [
         { Header: "Name", accessor: "name" },
@@ -57,44 +59,41 @@ const UsersAndDocuments = () => {
                 >
                   Show Documents
                 </button>
-                {loggedInUser.isAdmin && ( // Check if the logged-in user is an admin before showing admin actions
-                    <>
-                      {row.original.isAdmin ? (
-                          <button
-                              onClick={() => handleRevokeAdmin(row.original)}
-                              className="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded"
-                              aria-label={`Revoke admin for ${row.original.name}`}
-                              disabled={loading}
-                          >
-                            Revoke Admin
-                          </button>
-                      ) : (
-                          <button
-                              onClick={() => handleMakeAdmin(row.original)}
-                              className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded"
-                              aria-label={`Make admin for ${row.original.name}`}
-                              disabled={loading}
-                          >
-                            Make Admin
-                          </button>
-                      )}
-                      <button
-                          onClick={() => handleDeleteUser(row.original._id)}
-                          className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded"
-                          aria-label={`Delete user ${row.original.name}`}
-                          disabled={loading}
-                      >
-                        Delete User
-                      </button>
-                    </>
+                {row.original.isAdmin ? (
+                    <button
+                        onClick={() => handleRevokeAdmin(row.original)}
+                        className="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded"
+                        aria-label={`Revoke admin for ${row.original.name}`}
+                        disabled={loading}
+                    >
+                      Revoke Admin
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => handleMakeAdmin(row.original)}
+                        className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded"
+                        aria-label={`Make admin for ${row.original.name}`}
+                        disabled={loading}
+                    >
+                      Make Admin
+                    </button>
                 )}
+                <button
+                    onClick={() => handleDeleteUser(row.original._id)}
+                    className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded"
+                    aria-label={`Delete user ${row.original.name}`}
+                    disabled={loading}
+                >
+                  Delete User
+                </button>
               </div>
           ),
         },
       ],
-      [loading, loggedInUser.isAdmin]
+      [loading]
   );
 
+  // Memoized functions to avoid redefinition
   const handleShowDocuments = useCallback((user) => {
     setSelectedUser(user);
     setModalUser(user);
@@ -105,7 +104,13 @@ const UsersAndDocuments = () => {
     setLoading(true);
     try {
       await axios.patch(
-          `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`
+          `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }
       );
       toast.success(`${user.name} is now an admin.`);
       setUsers((prevUsers) =>
@@ -116,13 +121,19 @@ const UsersAndDocuments = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [adminToken]);
 
   const handleRevokeAdmin = useCallback(async (user) => {
     setLoading(true);
     try {
       await axios.patch(
-          `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`
+          `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }
       );
       toast.success(`${user.name} is no longer an admin.`);
       setUsers((prevUsers) =>
@@ -135,14 +146,19 @@ const UsersAndDocuments = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [adminToken]);
 
   const handleDeleteUser = useCallback(async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     setLoading(true);
     try {
       await axios.delete(
-          `https://document-management-system-1-0b91.onrender.com/users/${userId}`
+          `https://document-management-system-1-0b91.onrender.com/users/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }
       );
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
       toast.success("User deleted successfully.");
@@ -151,7 +167,7 @@ const UsersAndDocuments = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [adminToken]);
 
   return (
       <div className="container mx-auto mt-5">
@@ -169,7 +185,7 @@ const UsersAndDocuments = () => {
             isOpen={userDocumentsModalOpen}
             onClose={() => {
               setUserDocumentsModalOpen(false);
-              setModalUser(null);
+              setModalUser(null); // Clear modal state on close
             }}
             user={modalUser}
         />
