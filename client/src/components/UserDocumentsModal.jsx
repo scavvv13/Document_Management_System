@@ -43,49 +43,49 @@ const UserDocumentsModal = ({ isOpen, onClose, user }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center items-center bg-gray-800 bg-opacity-75">
-      <div className="bg-white p-4 rounded-md shadow-lg max-w-3xl w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">
-            {user ? `${user.name}'s Documents` : "User Documents"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      <div className="fixed inset-0 z-50 flex justify-center items-center bg-gray-900 bg-opacity-75">
+        <div className="modal-box w-full max-w-3xl p-6">
+          <div className="modal-header flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">
+              {user ? `${user.name}'s Documents` : "User Documents"}
+            </h2>
+            <button
+                onClick={onClose}
+                className="btn btn-sm btn-circle btn-outline text-gray-500 hover:bg-gray-100"
+                aria-label="Close"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <div className="overflow-y-auto max-h-96">
-          {loading ? (
-            <p className="text-center">Loading documents...</p>
-          ) : userDocuments.length > 0 ? (
-            userDocuments.map((doc) => (
-              <DocumentCard
-                key={doc._id}
-                document={doc}
-                onDelete={() => handleDeleteDocument(user._id, doc._id)}
-              />
-            ))
-          ) : (
-            <p className="text-center">No documents found for {user?.name}.</p>
-          )}
+              ✕
+            </button>
+          </div>
+          <div className="modal-body overflow-y-auto max-h-96">
+            {loading ? (
+                <div className="flex justify-center items-center">
+                  <button className="btn btn-ghost loading">Loading...</button>
+                </div>
+            ) : userDocuments.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {userDocuments.map((doc) => (
+                      <DocumentCard
+                          key={doc._id}
+                          document={doc}
+                          onDelete={() => handleDeleteDocument(user._id, doc._id)}
+                      />
+                  ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-500">No documents found for {user?.name}.</p>
+            )}
+          </div>
+          <div className="modal-footer flex justify-end mt-4">
+            <button
+                onClick={onClose}
+                className="btn btn-outline btn-sm"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 
