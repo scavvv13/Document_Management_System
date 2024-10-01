@@ -162,8 +162,8 @@ const MyDocuments = () => {
         {errorMessage && <div className="alert alert-error">{errorMessage}</div>}
 
         <header className="navbar bg-base-100 shadow-lg mb-4">
-          <h1 className="text-xl font-bold">My Documents</h1>
-          <div className="flex">
+          <h1 className="text-xl font-bold ml-3">My Documents</h1>
+          <div className="flex justify-end">
             <form onSubmit={handleCreateFolder} className="flex items-center">
               <input
                   type="text"
