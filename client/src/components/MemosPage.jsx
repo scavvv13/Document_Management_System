@@ -16,10 +16,10 @@ const MemosPage = () => {
     const fetchMemos = async () => {
       try {
         const response = await axios.get(
-          `https://document-management-system-1-0b91.onrender.com/memos`,
-          {
-            withCredentials: true,
-          }
+            `https://document-management-system-1-0b91.onrender.com/memos`,
+            {
+              withCredentials: true,
+            }
         );
         const today = new Date();
         const yesterday = new Date(today);
@@ -28,7 +28,7 @@ const MemosPage = () => {
         const getFormattedDate = (date) => {
           const memoDate = new Date(date);
           const daysDifference = Math.floor(
-            (today - memoDate) / (1000 * 60 * 60 * 24)
+              (today - memoDate) / (1000 * 60 * 60 * 24)
           );
 
           if (memoDate.toDateString() === today.toDateString()) {
@@ -81,29 +81,29 @@ const MemosPage = () => {
 
       if (isEditing) {
         const response = await axios.put(
-          `https://document-management-system-1-0b91.onrender.com/memos/${currentMemoId}`,
-          {
-            withCredentials: true,
-            title,
-            content,
-          }
+            `https://document-management-system-1-0b91.onrender.com/memos/${currentMemoId}`,
+            {
+              withCredentials: true,
+              title,
+              content,
+            }
         );
         setMemos((prevMemos) =>
-          prevMemos.map((memoGroup) => ({
-            ...memoGroup,
-            memos: memoGroup.memos.map((memo) =>
-              memo._id === currentMemoId ? response.data : memo
-            ),
-          }))
+            prevMemos.map((memoGroup) => ({
+              ...memoGroup,
+              memos: memoGroup.memos.map((memo) =>
+                  memo._id === currentMemoId ? response.data : memo
+              ),
+            }))
         );
       } else {
         const response = await axios.post(
-          `https://document-management-system-1-0b91.onrender.com/memos`,
-          {
-            withCredentials: true,
-            title,
-            content,
-          }
+            `https://document-management-system-1-0b91.onrender.com/memos`,
+            {
+              withCredentials: true,
+              title,
+              content,
+            }
         );
         setMemos((prevMemos) => [
           {
@@ -114,7 +114,7 @@ const MemosPage = () => {
             ],
           },
           ...prevMemos.filter(
-            (group) => group.title !== "Today" && group.title !== "Yesterday"
+              (group) => group.title !== "Today" && group.title !== "Yesterday"
           ),
         ]);
       }
@@ -136,16 +136,16 @@ const MemosPage = () => {
       }
 
       await axios.delete(
-        `https://document-management-system-1-0b91.onrender.com/memos/${id}`,
-        {
-          withCredentials: true,
-        }
+          `https://document-management-system-1-0b91.onrender.com/memos/${id}`,
+          {
+            withCredentials: true,
+          }
       );
       setMemos((prevMemos) =>
-        prevMemos.map((memoGroup) => ({
-          ...memoGroup,
-          memos: memoGroup.memos.filter((memo) => memo._id !== id),
-        }))
+          prevMemos.map((memoGroup) => ({
+            ...memoGroup,
+            memos: memoGroup.memos.filter((memo) => memo._id !== id),
+          }))
       );
       if (pinnedMemo && pinnedMemo._id === id) {
         setPinnedMemo(null);
@@ -171,144 +171,144 @@ const MemosPage = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-white">
-      {!user && (
-        <div className="w-full md:w-1/3 flex flex-col justify-center items-center p-4 md:p-8 bg-gray-100 shadow-md">
-          <LoginPage />
-        </div>
-      )}
-
-      <div className="flex-1 p-4 md:p-10 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 overflow-y-auto">
-        {/* Add/Edit Memo Form */}
-        {user && user.isAdmin && (
-          <div className="md:w-1/3 bg-gray-50 p-4 md:p-6 rounded-lg shadow-md">
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
-              {isEditing ? "Edit Memo" : "Add New Memo"}
-            </h2>
-            <form onSubmit={handleAddOrUpdateMemo}>
-              <div className="mb-4">
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter memo title"
-                  className="w-full p-2 md:p-3 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Enter memo content"
-                  rows="5"
-                  className="w-full p-2 md:p-3 border rounded-lg"
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="submit"
-                  className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg"
-                >
-                  {isEditing ? "Update Memo" : "Add Memo"}
-                </button>
-                {isEditing && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setTitle("");
-                      setContent("");
-                      setCurrentMemoId(null);
-                    }}
-                    className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
+      <div className="flex flex-col md:flex-row h-screen bg-base-100">
+        {!user && (
+            <div className="w-full md:w-1/3 flex flex-col justify-center items-center p-4 md:p-8 bg-gray-100 shadow-md">
+              <LoginPage />
+            </div>
         )}
 
-        {/* Memos List */}
-        <div className="flex-1">
-          <h1 className="text-xl md:text-2xl font-semibold mb-6 md:mb-8 text-gray-900 text-center">
-            Memorandum / Announcements
-          </h1>
-
-          {pinnedMemo && (
-            <div className="mb-6 md:mb-8">
-              <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
-                Pinned Memo
-              </h2>
-              <div className="bg-gray-100 p-4 md:p-6 rounded-lg shadow-sm">
-                <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
-                  {pinnedMemo.title}
-                </h3>
-                <p className="text-sm md:text-md text-gray-700">
-                  {pinnedMemo.content}
-                </p>
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={handleUnpinMemo}
-                    className="bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded-lg"
-                  >
-                    Unpin Memo
-                  </button>
-                </div>
+        <div className="flex-1 p-4 md:p-10 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 overflow-y-auto">
+          {/* Add/Edit Memo Form */}
+          {user && user.isAdmin && (
+              <div className="md:w-1/3 bg-gray-50 p-4 md:p-6 rounded-lg shadow-md">
+                <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
+                  {isEditing ? "Edit Memo" : "Add New Memo"}
+                </h2>
+                <form onSubmit={handleAddOrUpdateMemo}>
+                  <div className="mb-4">
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Enter memo title"
+                        className="w-full p-2 md:p-3 border rounded-lg"
+                    />
+                  </div>
+                  <div className="mb-4">
+                <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Enter memo content"
+                    rows="5"
+                    className="w-full p-2 md:p-3 border rounded-lg"
+                />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button
+                        type="submit"
+                        className="btn btn-success"
+                    >
+                      {isEditing ? "Update Memo" : "Add Memo"}
+                    </button>
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditing(false);
+                              setTitle("");
+                              setContent("");
+                              setCurrentMemoId(null);
+                            }}
+                            className="btn"
+                        >
+                          Cancel
+                        </button>
+                    )}
+                  </div>
+                </form>
               </div>
-            </div>
           )}
 
-          {memos.map((memoGroup) => (
-            <div key={memoGroup.title}>
-              <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
-                {memoGroup.title}
-              </h2>
-              <div className="space-y-4">
-                {memoGroup.memos.map((memo) => (
-                  <div
-                    key={memo._id}
-                    className="bg-gray-50 p-4 md:p-6 rounded-lg shadow-sm"
-                  >
+          {/* Memos List */}
+          <div className="flex-1">
+            <h1 className="text-xl md:text-2xl font-semibold mb-6 md:mb-8 text-gray-900 text-center">
+              Memorandum / Announcements
+            </h1>
+
+            {pinnedMemo && (
+                <div className="mb-6 md:mb-8">
+                  <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
+                    Pinned Memo
+                  </h2>
+                  <div className="bg-gray-100 p-4 md:p-6 rounded-lg shadow-sm">
                     <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
-                      {memo.title}
+                      {pinnedMemo.title}
                     </h3>
                     <p className="text-sm md:text-md text-gray-700">
-                      {memo.content}
+                      {pinnedMemo.content}
                     </p>
-                    <div className="mt-4 flex justify-end space-x-2">
-                      {user && user.isAdmin && (
-                        <>
-                          <button
-                            onClick={() => handleEditMemo(memo)}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-1 px-3 rounded-lg"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteMemo(memo._id)}
-                            className="bg-red-500 hover:bg-red-600 text-white font-medium py-1 px-3 rounded-lg"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
+                    <div className="mt-4 flex justify-end">
                       <button
-                        onClick={() => handlePinMemo(memo)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg"
+                          onClick={handleUnpinMemo}
+                          className="btn btn-error"
                       >
-                        Pin
+                        Unpin Memo
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
+                </div>
+            )}
+
+            {memos.map((memoGroup) => (
+                <div key={memoGroup.title}>
+                  <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-800">
+                    {memoGroup.title}
+                  </h2>
+                  <div className="space-y-4">
+                    {memoGroup.memos.map((memo) => (
+                        <div
+                            key={memo._id}
+                            className="bg-gray-50 p-4 md:p-6 rounded-lg shadow-sm"
+                        >
+                          <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
+                            {memo.title}
+                          </h3>
+                          <p className="text-sm md:text-md text-gray-700">
+                            {memo.content}
+                          </p>
+                          <div className="mt-4 flex justify-end space-x-2">
+                            {user && user.isAdmin && (
+                                <>
+                                  <button
+                                      onClick={() => handleEditMemo(memo)}
+                                      className="btn btn-warning"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                      onClick={() => handleDeleteMemo(memo._id)}
+                                      className="btn btn-error"
+                                  >
+                                    Delete
+                                  </button>
+                                </>
+                            )}
+                            <button
+                                onClick={() => handlePinMemo(memo)}
+                                className="btn btn-info"
+                            >
+                              Pin
+                            </button>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 
