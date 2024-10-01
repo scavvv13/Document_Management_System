@@ -900,9 +900,21 @@ app.delete("/notifications/:id", async (req, res) => {
 
 // Add this route to your existing routes
 
+app.options("/api/documents/:documentId/share", (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://document-management-system-1-0b91.onrender.com');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(200); // Send a successful response for preflight requests
+});
+
 app.post("/api/documents/:documentId/share", async (req, res) => {
   const { documentId } = req.params;
   const { email } = req.body;
+
+  // Manually set CORS headers for the POST request
+  res.setHeader('Access-Control-Allow-Origin', 'https://document-management-system-1-0b91.onrender.com');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   try {
     // Validate email format
@@ -926,8 +938,8 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
     // Check if the user is already in the sharedWith list
     if (document.sharedWith.includes(user._id)) {
       return res
-        .status(200)
-        .json({ message: "Document already shared with this user" });
+          .status(200)
+          .json({ message: "Document already shared with this user" });
     }
 
     // Add the user to the sharedWith array using $addToSet to avoid duplicates
@@ -936,13 +948,13 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
 
     // Create a notification for the user
     await createNotification(
-      user._id,
-      `A document has been shared with you: ${document.originalname}`
+        user._id,
+        `A document has been shared with you: ${document.originalname}`
     );
 
     return res
-      .status(200)
-      .json({ message: `Document shared with ${email} successfully` });
+        .status(200)
+        .json({ message: `Document shared with ${email} successfully` });
   } catch (error) {
     console.error("Error sharing document:", error);
     return res.status(500).json({ message: "Error sharing document" });
