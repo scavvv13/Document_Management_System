@@ -917,10 +917,10 @@ app.post("/api/documents/:documentId/share", async (req, res) => {
     ]);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(405).json({ message: "User not found" });
     }
     if (!document) {
-      return res.status(404).json({ message: "Document not found" });
+      return res.status(406).json({ message: "Document not found" });
     }
 
     // Check if the user is already in the sharedWith list
