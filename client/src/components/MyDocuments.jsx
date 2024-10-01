@@ -16,7 +16,7 @@ const MyDocuments = () => {
   const [newFolderName, setNewFolderName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
+  const [errorMessage, setErrorMessage] = useState("");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -28,13 +28,13 @@ const MyDocuments = () => {
 
   const fetchData = async (url, params, setData) => {
     try {
-      setLoadingMessage(`Loading...`);
+      setLoadingMessage("Loading...");
       setIsLoading(true);
       const response = await axios.get(url, { params });
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setErrorMessage("Could not load data. Please try again later."); // Set error message
+      setErrorMessage("Could not load data. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -63,10 +63,7 @@ const MyDocuments = () => {
   };
 
   const handleDeleteFolder = async () => {
-    if (
-      !selectedFolder ||
-      !window.confirm("Are you sure you want to delete this folder?")
-    )
+    if (!selectedFolder || !window.confirm("Are you sure you want to delete this folder?"))
       return;
     await deleteEntity(`/folders/${selectedFolder._id}`, setFolders, "folder");
     setSelectedFolder(null);
@@ -78,9 +75,7 @@ const MyDocuments = () => {
       setLoadingMessage(`Deleting ${entity}...`);
       setIsLoading(true);
       await axios.delete(url);
-      setData((prev) =>
-        prev.filter((item) => item._id !== url.split("/").pop())
-      );
+      setData((prev) => prev.filter((item) => item._id !== url.split("/").pop()));
     } catch (error) {
       console.error(`Error deleting ${entity}:`, error);
       setErrorMessage(`Could not delete ${entity}. Please try again.`);
@@ -110,7 +105,7 @@ const MyDocuments = () => {
       });
       setSelectedFile(null);
       fileInputRef.current.value = "";
-      fetchDocuments(); // Refresh documents
+      fetchDocuments();
       if (selectedFolder) {
         fetchDocumentsByFolder(selectedFolder._id);
       }
@@ -158,105 +153,93 @@ const MyDocuments = () => {
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className="text-center">Loading...</div>;
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-6 lg:p-8">
-      <LoadingModal isLoading={isLoading} message={loadingMessage} />
-      {errorMessage && <div className="text-red-500">{errorMessage}</div>}{" "}
-      {/* Display error message */}
-      <header className="w-full p-4 mb-4 bg-white border border-gray-250 rounded-full shadow-md shadow-gray-400 flex justify-between items-center">
-        <h1 className="text-xl font-bold pl-6">My Documents</h1>
-        <div className="flex items-center gap-2">
-          <form
-            onSubmit={handleCreateFolder}
-            className="flex items-center gap-2"
-          >
-            <input
-              type="text"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              className="border border-gray-300 p-2 rounded flex-grow"
-              placeholder="New Folder Name"
-              style={{ width: "200px" }}
-            />
-            <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Create Folder
-            </button>
-          </form>
-          <div className="flex items-center gap-2 pr-7">
-            <label className="bg-gray-200 hover:bg-gray-300 text-gray-500 font-bold py-2 px-4 rounded cursor-pointer">
-              {fileInputRef.current?.files?.[0]?.name || "No file selected"}
+      <div className="container mx-auto p-4">
+        <LoadingModal isLoading={isLoading} message={loadingMessage} />
+        {errorMessage && <div className="alert alert-error">{errorMessage}</div>}
+
+        <header className="navbar bg-base-100 shadow-lg mb-4">
+          <h1 className="text-xl font-bold">My Documents</h1>
+          <div className="flex">
+            <form onSubmit={handleCreateFolder} className="flex items-center">
               <input
-                type="file"
-                onChange={handleFileChange}
-                ref={fileInputRef}
-                className="hidden"
+                  type="text"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  className="input input-bordered mr-2"
+                  placeholder="New Folder Name"
               />
-            </label>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleFileUpload}
-              disabled={!selectedFile}
-            >
-              Upload
-            </button>
-          </div>
-        </div>
-      </header>
-      <div className="flex flex-col lg:flex-row lg:space-x-4">
-        <div className="lg:w-1/4 p-4 bg-white shadow-md rounded mb-4 lg:mb-0">
-          <h2 className="text-lg font-semibold mb-4">Folders</h2>
-          <ul className="list-none space-y-4">
-            {folders.map((folder) => (
-              <li key={folder._id}>
-                <button
-                  className={`block w-full p-2 rounded-lg text-left focus:outline-none ${
-                    selectedFolder?._id === folder._id
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                  onClick={() => handleFolderClick(folder)}
-                >
-                  {folder.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {selectedFolder && (
-            <div className="mt-4">
+              <button type="submit" className="btn btn-success">
+                Create Folder
+              </button>
+            </form>
+            <div className="ml-4">
+              <label className="btn btn-secondary">
+                {fileInputRef.current?.files?.[0]?.name || "Select File"}
+                <input
+                    type="file"
+                    onChange={handleFileChange}
+                    ref={fileInputRef}
+                    className="hidden"
+                />
+              </label>
               <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleDeleteFolder}
+                  className="btn btn-primary ml-2"
+                  onClick={handleFileUpload}
+                  disabled={!selectedFile}
               >
-                Delete Folder
+                Upload
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        </header>
 
-        <div className="lg:w-3/4 p-4 bg-white shadow-md rounded">
-          <h2 className="text-lg font-semibold mb-4">Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(selectedFolder ? folderDocuments : documents).map((document) => (
-              <DocumentCard
-                key={document._id}
-                document={document}
-                onClick={() => handleTitleClick(document)}
-                onDelete={() => handleDeleteDocument(document._id)}
-              />
-            ))}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="lg:col-span-1">
+            <h2 className="text-lg font-semibold">Folders</h2>
+            <ul className="menu bg-base-200 p-2 rounded-box">
+              {folders.map((folder) => (
+                  <li key={folder._id}>
+                    <button
+                        className={`${
+                            selectedFolder?._id === folder._id ? "bg-primary text-white" : ""
+                        }`}
+                        onClick={() => handleFolderClick(folder)}
+                    >
+                      {folder.name}
+                    </button>
+                  </li>
+              ))}
+            </ul>
+            {selectedFolder && (
+                <button className="btn btn-error mt-4" onClick={handleDeleteFolder}>
+                  Delete Folder
+                </button>
+            )}
+          </div>
+
+          <div className="lg:col-span-3">
+            <h2 className="text-lg font-semibold mb-4">Documents</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(selectedFolder ? folderDocuments : documents).map((document) => (
+                  <DocumentCard
+                      key={document._id}
+                      document={document}
+                      onClick={() => handleTitleClick(document)}
+                      onDelete={() => handleDeleteDocument(document._id)}
+                  />
+              ))}
+            </div>
           </div>
         </div>
+
+        {selectedDocument && (
+            <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
+        )}
       </div>
-      {selectedDocument && (
-        <DocumentModal document={selectedDocument} onClose={handleCloseModal} />
-      )}
-    </div>
   );
 };
 
