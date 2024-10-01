@@ -900,14 +900,14 @@ app.delete("/notifications/:id", async (req, res) => {
 
 // Add this route to your existing routes
 
-app.options("/api/documents/:documentId/share", (req, res) => {
+app.options("documents/:documentId/share", (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://document-management-system-1-0b91.onrender.com');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.sendStatus(200); // Send a successful response for preflight requests
 });
 
-app.post("/api/documents/:documentId/share", async (req, res) => {
+app.post("documents/:documentId/share", async (req, res) => {
   const { documentId } = req.params;
   const { email } = req.body;
 
