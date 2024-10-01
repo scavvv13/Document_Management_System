@@ -53,7 +53,7 @@ const UsersAndDocuments = () => {
               <div className="flex justify-start space-x-2">
                 <button
                     onClick={() => handleShowDocuments(row.original)}
-                    className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded"
+                    className="btn btn-primary btn-sm"
                     aria-label={`Show documents for ${row.original.name}`}
                     disabled={loading}
                 >
@@ -62,7 +62,7 @@ const UsersAndDocuments = () => {
                 {row.original.isAdmin ? (
                     <button
                         onClick={() => handleRevokeAdmin(row.original)}
-                        className="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded"
+                        className="btn btn-warning btn-sm"
                         aria-label={`Revoke admin for ${row.original.name}`}
                         disabled={loading}
                     >
@@ -71,7 +71,7 @@ const UsersAndDocuments = () => {
                 ) : (
                     <button
                         onClick={() => handleMakeAdmin(row.original)}
-                        className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded"
+                        className="btn btn-success btn-sm"
                         aria-label={`Make admin for ${row.original.name}`}
                         disabled={loading}
                     >
@@ -80,7 +80,7 @@ const UsersAndDocuments = () => {
                 )}
                 <button
                     onClick={() => handleDeleteUser(row.original._id)}
-                    className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded"
+                    className="btn btn-error btn-sm"
                     aria-label={`Delete user ${row.original.name}`}
                     disabled={loading}
                 >
@@ -100,82 +100,97 @@ const UsersAndDocuments = () => {
     setUserDocumentsModalOpen(true);
   }, []);
 
-  const handleMakeAdmin = useCallback(async (user) => {
-    setLoading(true);
-    try {
-      await axios.patch(
-          `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`,
-          null,
-          {
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          }
-      );
-      toast.success(`${user.name} is now an admin.`);
-      setUsers((prevUsers) =>
-          prevUsers.map((u) => (u._id === user._id ? { ...u, isAdmin: true } : u))
-      );
-    } catch (error) {
-      handleApiError(error, "Failed to make user an admin.");
-    } finally {
-      setLoading(false);
-    }
-  }, [adminToken]);
+  const handleMakeAdmin = useCallback(
+      async (user) => {
+        setLoading(true);
+        try {
+          await axios.patch(
+              `https://document-management-system-1-0b91.onrender.com/users/${user._id}/make-admin`,
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${adminToken}`,
+                },
+              }
+          );
+          toast.success(`${user.name} is now an admin.`);
+          setUsers((prevUsers) =>
+              prevUsers.map((u) =>
+                  u._id === user._id ? { ...u, isAdmin: true } : u
+              )
+          );
+        } catch (error) {
+          handleApiError(error, "Failed to make user an admin.");
+        } finally {
+          setLoading(false);
+        }
+      },
+      [adminToken]
+  );
 
-  const handleRevokeAdmin = useCallback(async (user) => {
-    setLoading(true);
-    try {
-      await axios.patch(
-          `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`,
-          null,
-          {
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          }
-      );
-      toast.success(`${user.name} is no longer an admin.`);
-      setUsers((prevUsers) =>
-          prevUsers.map((u) =>
-              u._id === user._id ? { ...u, isAdmin: false } : u
-          )
-      );
-    } catch (error) {
-      handleApiError(error, "Failed to revoke admin status.");
-    } finally {
-      setLoading(false);
-    }
-  }, [adminToken]);
+  const handleRevokeAdmin = useCallback(
+      async (user) => {
+        setLoading(true);
+        try {
+          await axios.patch(
+              `https://document-management-system-1-0b91.onrender.com/users/${user._id}/revoke-admin`,
+              null,
+              {
+                headers: {
+                  Authorization: `Bearer ${adminToken}`,
+                },
+              }
+          );
+          toast.success(`${user.name} is no longer an admin.`);
+          setUsers((prevUsers) =>
+              prevUsers.map((u) =>
+                  u._id === user._id ? { ...u, isAdmin: false } : u
+              )
+          );
+        } catch (error) {
+          handleApiError(error, "Failed to revoke admin status.");
+        } finally {
+          setLoading(false);
+        }
+      },
+      [adminToken]
+  );
 
-  const handleDeleteUser = useCallback(async (userId) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
-    setLoading(true);
-    try {
-      await axios.delete(
-          `https://document-management-system-1-0b91.onrender.com/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${adminToken}`,
-            },
-          }
-      );
-      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
-      toast.success("User deleted successfully.");
-    } catch (error) {
-      handleApiError(error, "Failed to delete user.");
-    } finally {
-      setLoading(false);
-    }
-  }, [adminToken]);
+  const handleDeleteUser = useCallback(
+      async (userId) => {
+        if (!window.confirm("Are you sure you want to delete this user?")) return;
+        setLoading(true);
+        try {
+          await axios.delete(
+              `https://document-management-system-1-0b91.onrender.com/users/${userId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${adminToken}`,
+                },
+              }
+          );
+          setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+          toast.success("User deleted successfully.");
+        } catch (error) {
+          handleApiError(error, "Failed to delete user.");
+        } finally {
+          setLoading(false);
+        }
+      },
+      [adminToken]
+  );
 
   return (
       <div className="container mx-auto mt-5">
-        <h1 className="text-2xl font-bold mb-5">Users and Documents</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center">
+          Users and Documents
+        </h1>
         <div className="flex justify-center">
           <div className="w-full">
             {loading ? (
-                <div className="text-center">Loading...</div>
+                <div className="flex justify-center">
+                  <button className="btn btn-ghost loading">Loading...</button>
+                </div>
             ) : (
                 <Table columns={columns} data={users} />
             )}
