@@ -4,7 +4,7 @@ import { UserContext } from "../UserContext";
 import LoginPage from "./LoginPage";
 
 const MemosPage = () => {
-  const { user } = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const [memos, setMemos] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -36,7 +36,7 @@ const MemosPage = () => {
           } else if (memoDate.toDateString() === yesterday.toDateString()) {
             return "Yesterday";
           } else if (daysDifference < 7) {
-            return memoDate.toLocaleString("default", { weekday: "long" });
+            return memoDate.toLocaleString("default", {weekday: "long"});
           } else {
             return memoDate.toLocaleDateString(undefined, {
               month: "long",
@@ -174,11 +174,11 @@ const MemosPage = () => {
       <div className="flex flex-col md:flex-row h-screen bg-base-100">
         {!user && (
             <div className="w-full md:w-1/3 flex flex-col justify-center items-center p-4 md:p-8 bg-gray-100 shadow-md">
-              <LoginPage />
+              <LoginPage/>
             </div>
         )}
 
-        <div className="flex-1 p-4 md:p-10 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 overflow-y-auto">
+        <div className="flex-1 p-4 md:p-10 flex flex-col md:flex-row overflow-hidden">
           {/* Add/Edit Memo Form */}
           {user && user.isAdmin && (
               <div className="md:w-1/3 bg-gray-50 p-4 md:p-6 rounded-lg shadow-md">
@@ -196,19 +196,16 @@ const MemosPage = () => {
                     />
                   </div>
                   <div className="mb-4">
-                <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Enter memo content"
-                    rows="5"
-                    className="w-full p-2 md:p-3 border rounded-lg"
-                />
+              <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Enter memo content"
+                  rows="5"
+                  className="w-full p-2 md:p-3 border rounded-lg"
+              />
                   </div>
                   <div className="flex justify-end space-x-2">
-                    <button
-                        type="submit"
-                        className="btn btn-success"
-                    >
+                    <button type="submit" className="btn btn-success">
                       {isEditing ? "Update Memo" : "Add Memo"}
                     </button>
                     {isEditing && (
@@ -231,7 +228,7 @@ const MemosPage = () => {
           )}
 
           {/* Memos List */}
-          <div className="flex-1">
+          <div className="flex-1 overflow-y-auto h-full">
             <h1 className="text-xl md:text-2xl font-semibold mb-6 md:mb-8 text-gray-900 text-center">
               Memorandum / Announcements
             </h1>
@@ -245,14 +242,9 @@ const MemosPage = () => {
                     <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
                       {pinnedMemo.title}
                     </h3>
-                    <p className="text-sm md:text-md text-gray-700">
-                      {pinnedMemo.content}
-                    </p>
+                    <p className="text-sm md:text-md text-gray-700">{pinnedMemo.content}</p>
                     <div className="mt-4 flex justify-end">
-                      <button
-                          onClick={handleUnpinMemo}
-                          className="btn btn-error"
-                      >
+                      <button onClick={handleUnpinMemo} className="btn btn-error">
                         Unpin Memo
                       </button>
                     </div>
@@ -267,37 +259,23 @@ const MemosPage = () => {
                   </h2>
                   <div className="space-y-4">
                     {memoGroup.memos.map((memo) => (
-                        <div
-                            key={memo._id}
-                            className="bg-gray-50 p-4 md:p-6 rounded-lg shadow-sm"
-                        >
+                        <div key={memo._id} className="bg-gray-50 p-4 md:p-6 rounded-lg shadow-sm">
                           <h3 className="text-md md:text-lg font-medium mb-2 text-gray-800">
                             {memo.title}
                           </h3>
-                          <p className="text-sm md:text-md text-gray-700">
-                            {memo.content}
-                          </p>
+                          <p className="text-sm md:text-md text-gray-700">{memo.content}</p>
                           <div className="mt-4 flex justify-end space-x-2">
                             {user && user.isAdmin && (
                                 <>
-                                  <button
-                                      onClick={() => handleEditMemo(memo)}
-                                      className="btn btn-warning"
-                                  >
+                                  <button onClick={() => handleEditMemo(memo)} className="btn btn-warning">
                                     Edit
                                   </button>
-                                  <button
-                                      onClick={() => handleDeleteMemo(memo._id)}
-                                      className="btn btn-error"
-                                  >
+                                  <button onClick={() => handleDeleteMemo(memo._id)} className="btn btn-error">
                                     Delete
                                   </button>
                                 </>
                             )}
-                            <button
-                                onClick={() => handlePinMemo(memo)}
-                                className="btn btn-info"
-                            >
+                            <button onClick={() => handlePinMemo(memo)} className="btn btn-info">
                               Pin
                             </button>
                           </div>
@@ -312,4 +290,4 @@ const MemosPage = () => {
   );
 };
 
-export default MemosPage;
+  export default MemosPage;
